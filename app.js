@@ -1,0 +1,147 @@
+var createError = require('http-errors');
+var express = require('express');
+var path = require('path');
+var fs = require('fs');
+var cookieParser = require('cookie-parser');
+var bodyParser = require('body-parser');        // Для просмотра request.body в POST
+var logger = require('morgan');
+var cons = require('consolidate');
+
+//### Mongo sessions
+var mongoose = require("mongoose")
+var session = require('express-session')
+var MongoStore = require('connect-mongo')(session);
+
+var app = express();
+
+//### view engine setup
+app.engine('html', cons.swig)
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'html');
+
+//app.use(favicon());
+app.use(logger('dev'));
+
+//### req.body parse
+app.use(express.urlencoded({ extended: false })); // этим мы делаем доступным объект req.body (ну а в нем поля формы)
+app.use(express.json()); // Для просмотра request.body в POST
+
+app.use(cookieParser());
+app.use(express.static(path.join(__dirname, 'public')));
+
+//### Logging
+app.use(function(req, res, next){
+    let now = new Date();
+
+    let date = now.toISOString().slice(0,10);
+    let year = date.slice(0,4)
+    let month = date.slice(6,7)
+    let day = date.slice(9,10)
+
+    let hour = now.getHours();
+    let minutes = now.getMinutes();
+    let seconds = now.getSeconds();
+    let data = `${day}.${month}.${year} ${hour}:${minutes}:${seconds} ${req.method} ${req.url} ${req.get("user-agent")}`;
+    fs.appendFile("server.log", data + "\n", function(){});
+    next();
+});
+
+//### Sessions
+var sess = {
+    secret: 'super_secret_word', // секретное слово для шифрования
+    credentials: 'include',
+    resave: false,            // имя куки
+    cookie: {
+        path: '/',          // где действует
+        httpOnly: true,     // чтобы куку не могли читать на клиенте
+        maxAge: new Date(Date.now() + 3600000)        // время жизни куки в милисекундах(null = infinity)
+    },
+    saveUninitialized: false,
+    store: new MongoStore({
+        url: 'mongodb://localhost:27017/usersdb'
+    })
+//    store: new MongoStore({
+//      "db" : "usersdb",
+//      "collection" : "sessions",
+//      "host" : "localhost",
+//      "port" : 27017
+//    })
+}
+if (app.get('env') === 'production') {
+  app.set('trust proxy', 1) // trust first proxy
+  sess.cookie.secure = true // serve secure cookies
+}
+app.use(session(sess))
+
+//### Запись и хранение данных в куки
+app.all('/', function (req, res, next) {
+
+    // в независимости от логина или нет получаем id
+    console.log(req.sessionID);
+
+    // в сессию мы можем проставлять кастомные переменные
+    req.session.views = req.session.views === void 0 ? 0 : req.session.views;
+    req.session.views++;
+    next();
+})
+
+//### Конфигурация Passport
+var passport = require('passport');
+var passportJWT = require('passport-jwt');
+var ExtractJWT = passportJWT.ExtractJwt;
+var Strategy = passportJWT.Strategy;
+
+var db = require('./db/db');
+var config = require('./config/config');
+
+const params = {
+  secretOrKey: config.secret,
+  jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken()
+};
+
+let strategy = new Strategy(params, function(payload, done){
+  db
+    .getUserId(payload.id)
+    .then((results)=>{
+      if (results.length == 0) {
+        return done(new Error('Юзер не найден'), null)
+      } else {
+        return done(null, {
+          id: results._id
+        })
+      }
+    })
+    .catch((err)=>{
+      return done(err);
+    })
+})
+passport.use(strategy);
+
+//### Routers Files
+var indexRouter = require('./routes/index');
+
+//### Routes
+app.use('/', indexRouter); // AUTH
+
+
+
+/* ### === Error handlers block === */
+
+// catch 404 and forward to error handler
+app.use(function(req, res, next) {
+    next(createError(404));
+});
+
+// error handler
+app.use(function(err, req, res, next) {
+    console.log('=== ERROR', err)
+    // set locals, only providing error in development
+    res.locals.message = err.message;
+    res.locals.error = req.app.get('env') === 'development' ? err : {};
+
+    // render the error page
+    res.status(err.status || 500);
+    res.render('error', { code: err.status, message: err.message });
+});
+
+module.exports = app;
