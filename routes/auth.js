@@ -34,16 +34,24 @@ router.post('/login', (req, res, next)=>{
     .get(db.users_database, db.users_collection, filter, fields)
     .then((results)=>{
       console.log('login results', results)
-      if (conversion.isValidPassword(req.body.password, results[0].password.value)) {
-        let payload ={
-          id: results[0]._id
-        }
-        let token = jwt.encode(payload, config.secret);
-        req.session.user = {id: results[0]._id, email: results[0].email.value}
-		req.session.save()  // Сохранение сессии в БД mongoStore
-        res.json({status: 200, token: token});
+      if(results.length > 0) {
+        if (conversion.isValidPassword(req.body.password, results[0].password.value)) {
+          let payload ={
+            id: results[0]._id
+          }
+          let token = jwt.encode(payload, config.secret);
+          req.session.user = {id: results[0]._id, email: results[0].email.value}
+          req.session.save()  // Сохранение сессии в БД mongoStore
+          res.json({status: 200, token: token});
 
-      } else {
+        }
+        else {
+          const err = new Error('Не верный логин или пароль!');
+          err.status = 400;
+          next(err);
+        }
+      }
+      else {
         const err = new Error('Не верный логин или пароль!');
         err.status = 400;
         next(err);
@@ -88,16 +96,26 @@ router.post('/signup', (req, res, next)=>{
         db
           .create(db.users_database,db.users_collection, data)
           .then((results)=>{
+            let payload ={
+              id: results.ops[0]._id
+            }
+            let token = jwt.encode(payload, config.secret);
+            req.session.user = {id: results.ops[0]._id, email: results.ops[0].email.value}
+            req.session.save()  // Сохранение сессии в БД mongoStore
+            console.log('sess', req.session)
+
             res.json({
+              status: 200,
               message: 'Пользователь добавлен',
               user_id: results.ops[0]._id,
+              token: token
             })
           })
           .catch((err)=>{
             next(err);
           })
       } else {
-        const err = new Error('Такой пользователь уже есть!');
+        const err = new Error('Пользователь с такой почтой уже существует!');
         err.status = 400;
           next(err);
       }
