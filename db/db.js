@@ -5,6 +5,9 @@ const url = "mongodb://localhost:27017/";
 module.exports.users_database = 'usersdb';
 module.exports.users_collection = 'users';
 
+module.exports.secure_database = 'securedb';
+module.exports.secure_collection = 'users';
+
 const conversion = require('../db/data_conversion');
 
 
