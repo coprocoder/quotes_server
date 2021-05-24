@@ -2,6 +2,9 @@ const MongoClient = require('mongodb').MongoClient;
 const ObjectID = require('mongodb').ObjectID;
 const url = "mongodb://localhost:27017/";
 
+module.exports.users_database = 'usersdb';
+module.exports.users_collection = 'users';
+
 module.exports.getById = function(cur_db, cur_collection, cur_id) {
   return new Promise((resolve, reject) => {
     const id = new ObjectID(cur_id);
@@ -30,6 +33,7 @@ module.exports.getById = function(cur_db, cur_collection, cur_id) {
 
 // Get fields by path
 module.exports.get = function(cur_db, cur_collection, filter, fields) {
+  console.log('GET FILTER', filter)
   console.log('GET DATA', fields)
   return new Promise((resolve, reject) => {
     MongoClient
@@ -116,7 +120,7 @@ module.exports.remove = function(cur_db, cur_collection, filter, data) {
 
 /* === NEW ITEMS BLOCK === */
 
-module.exports.create = function(cur_db, cur_coll, data) {
+module.exports.create = function(cur_db, cur_collection, data) {
   console.log('CREATE DATA', data)
   return new Promise((resolve, reject) => {
     MongoClient
@@ -126,7 +130,7 @@ module.exports.create = function(cur_db, cur_coll, data) {
         }
         client
           .db(cur_db)
-          .collection(cur_coll)
+          .collection(cur_collection)
           .insertOne(data,
             function(err, results){
               if (err) {
@@ -140,7 +144,7 @@ module.exports.create = function(cur_db, cur_coll, data) {
   })
 }
 
-module.exports.delete = function(cur_db, cur_coll, data) {
+module.exports.delete = function(cur_db, cur_collection, data) {
   console.log('DELETE DATA', data)
   return new Promise((resolve, reject) => {
     MongoClient
@@ -150,7 +154,7 @@ module.exports.delete = function(cur_db, cur_coll, data) {
         }
         client
           .db(cur_db)
-          .collection(cur_coll)
+          .collection(cur_collection)
           .deleteMany(data,
             function(err, results){
               if (err) {

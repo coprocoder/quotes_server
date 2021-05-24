@@ -19,7 +19,7 @@ $(document).ready(function(){
 
     $('#logout_btn').on('click', function(){
         $.ajax({
-            url: '/logout',
+            url: '/auth/logout',
             method: 'post',
             success: function(response){
                 console.log('logout', response)
