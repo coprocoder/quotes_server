@@ -47,13 +47,13 @@ router.post('/login', (req, res, next)=>{
         }
         else {
           const err = new Error('Не верный логин или пароль!');
-          err.status = 400;
+          err.status = 401;
           next(err);
         }
       }
       else {
         const err = new Error('Не верный логин или пароль!');
-        err.status = 400;
+        err.status = 401;
         next(err);
       }
     })
