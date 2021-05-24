@@ -5,6 +5,9 @@ const url = "mongodb://localhost:27017/";
 module.exports.users_database = 'usersdb';
 module.exports.users_collection = 'users';
 
+const conversion = require('../db/data_conversion');
+
+
 module.exports.getById = function(cur_db, cur_collection, cur_id) {
   return new Promise((resolve, reject) => {
     const id = new ObjectID(cur_id);
@@ -34,7 +37,7 @@ module.exports.getById = function(cur_db, cur_collection, cur_id) {
 // Get fields by path
 module.exports.get = function(cur_db, cur_collection, filter, fields) {
   console.log('GET FILTER', filter)
-  console.log('GET DATA', fields)
+  console.log('GET FIELDS', fields)
   return new Promise((resolve, reject) => {
     MongoClient
       .connect(url, function(err, client) {
@@ -45,7 +48,7 @@ module.exports.get = function(cur_db, cur_collection, filter, fields) {
           .db(cur_db)
           .collection(cur_collection)
           .find(
-            filter,
+            filter,               // ex: {"email": "mail@mail.ru"}
             {projection:fields},  // ex: {projection:{"first":1, "second":0}},
           )
           .toArray(function(err, results){
@@ -60,13 +63,18 @@ module.exports.get = function(cur_db, cur_collection, filter, fields) {
 }
 
 // Update field by path
-module.exports.update = function(cur_db, cur_collection, filter, data) {
-  console.log('UPDATE DATA', data)
+module.exports.update = function(cur_db, cur_collection, filter, fields) {
+  console.log('UPDATE FILTER', filter)
+  console.log('UPDATE FIELDS', fields)
+
   return new Promise((resolve, reject) => {
     MongoClient
       .connect(url, function(err, client) {
         if (err) {
           reject(err);
+        }
+        if(!!fields.password){
+          reject({message:"Вы не можете изменять пароль"});
         }
         client
           .db(cur_db)
@@ -74,8 +82,7 @@ module.exports.update = function(cur_db, cur_collection, filter, data) {
           .updateOne(
             filter,
             [
-              { $set: data },           // Set fields values, ex: { $set: { age: 27 } }
-              //{ $unset: ["age"] }     // Remove fields
+              { $set: fields },
             ],
             function(err, results){
               if (err) {
@@ -90,8 +97,9 @@ module.exports.update = function(cur_db, cur_collection, filter, data) {
 }
 
 // Remove field by path
-module.exports.remove = function(cur_db, cur_collection, filter, data) {
-  console.log('DELETE DATA', data)
+module.exports.remove = function(cur_db, cur_collection, filter, fields) {
+  console.log('DELETE FILTER', filter)
+  console.log('DELETE FIELDS', fields)
   return new Promise((resolve, reject) => {
     MongoClient
       .connect(url, function(err, client) {
@@ -103,7 +111,7 @@ module.exports.remove = function(cur_db, cur_collection, filter, data) {
           .collection(cur_collection)
           .update(
             filter,
-            { $unset: data},     // Remove fields
+            { $unset: fields},     // Remove fields
             function(err, results){
               if (err) {
                 reject(err);
@@ -115,7 +123,6 @@ module.exports.remove = function(cur_db, cur_collection, filter, data) {
       });
   })
 }
-
 
 
 /* === NEW ITEMS BLOCK === */

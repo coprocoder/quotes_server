@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db/db');
-const bcrypt = require('bcrypt-nodejs');
+const conversion = require('../db/data_conversion');
 
 const jwt = require('jwt-simple');
 const config = require('../config/config');
@@ -18,41 +18,28 @@ router.get('/secret', auth, (req, res)=>{
   })
 });
 
-/* ### === Secondary functions block  === */
-
-// Compare (password from request) and (password hash from db)
-const isValidPassword = function(user, password) {
-  return bcrypt.compareSync(password, user.password);
-}
-
-// Generates hash using bCrypt
-const createHash = function(password){
-    return bcrypt.hashSync(password, bcrypt.genSaltSync(10), null);
-}
-
-
 
 /* ### === Authorization block === */
 
 router.post('/login', (req, res, next)=>{
   /* Login = Autorization
     Fields:
-        -username
+        -email
         -password
   */
   console.log('login req.body', req.body)
-  var filter = {"username": req.body.username};
+  var filter = {"email.value": req.body.email};
   var fields = {};
   db
     .get(db.users_database, db.users_collection, filter, fields)
     .then((results)=>{
       console.log('login results', results)
-      if (isValidPassword(results[0], req.body.password)) {
+      if (conversion.isValidPassword(req.body.password, results[0].password.value)) {
         let payload ={
           id: results[0]._id
         }
         let token = jwt.encode(payload, config.secret);
-        req.session.user = {id: results[0]._id, name: results[0].username}
+        req.session.user = {id: results[0]._id, email: results[0].email.value}
 		req.session.save()  // Сохранение сессии в БД mongoStore
         res.json({status: 200, token: token});
 
@@ -77,50 +64,47 @@ router.post('/logout', (req, res, next)=>{
 router.post('/signup', (req, res, next)=>{
   /* SignUp = Registration
     Fields:
-      -username
       -password
-      -repeatPassword
       -email
   */
   console.log('signup req.body', req.body)
-  if(req.body.password === req.body.repeatPassword){
-    var filter = {"username": req.body.username};
-    var fields = {};
-    db
-      .get(db.users_database, db.users_collection, filter, fields)
-      .then((results)=>{
-        if (results.length == 0){
-          data = {
-            username: req.body.username,
-            password: createHash(req.body.password),
-            email: req.body.email,
-          };
-          db
-            .add('users', data)
-            .then((results)=>{
-              console.log('results', results)
-              res.json({
-                message: 'Пользователь добавлен',
-                user_id: results._id,
-              })
+  var timestamp = new Date().getTime();
+  var filter = {"email": req.body.email};
+  var fields = {};
+  db
+    .get(db.users_database, db.users_collection, filter, fields)
+    .then((results)=>{
+      if (results.length == 0){
+        data = {
+          password: {
+              'value': conversion.createHash(req.body.password),
+              'uptime': timestamp
+          },
+          email: {
+              'value': req.body.email,
+              'uptime': timestamp
+          }
+        };
+        db
+          .create(db.users_database,db.users_collection, data)
+          .then((results)=>{
+            res.json({
+              message: 'Пользователь добавлен',
+              user_id: results.ops[0]._id,
             })
-            .catch((err)=>{
-              next(err);
-            })
-        } else {
-          const err = new Error('Такой пользователь уже есть!');
-          err.status = 400;
+          })
+          .catch((err)=>{
             next(err);
-        }
-      })
-      .catch((err)=>{
-        next(err);
-      })
-  } else {
-    const err = new Error('Не совпадает пароль и подтверждение пароля!');
-    err.status = 400;
+          })
+      } else {
+        const err = new Error('Такой пользователь уже есть!');
+        err.status = 400;
+          next(err);
+      }
+    })
+    .catch((err)=>{
       next(err);
-  }
+    })
 })
 
 

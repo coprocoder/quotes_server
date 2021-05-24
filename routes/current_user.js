@@ -14,7 +14,7 @@ router.post('/get', (req, res, next)=>{
       }
   */
   console.log('GET req.body', req.body)
-  var filter = {'username':req.session.user.name};
+  var filter = {'email.value': req.session.user.email};
   var fields = req.body;
   db
     .get(db.users_database, db.users_collection, filter, fields)
@@ -67,14 +67,15 @@ router.post('/update', (req, res, next)=>{
       }
   */
   console.log('UPDATE req.body', req.body)
-  var filter = {'username':req.session.user.name};
+  var filter = {'email.value':req.session.user.email};
   var data = req.body;
   db
     .update(db.users_database, db.users_collection, filter, data)
     .then((results)=>{
-      //console.log('UPDATE results', results)
       if (!!results){
-        res.send({status: 200, message: "Данные обновлены"});
+        if(!!req.body.email)
+            req.session.user.email = req.body.email.value
+        res.send({message: "Данные обновлены"});
       } else {
         const err = new Error('Данные не найдены!');
         err.status = 400;
@@ -93,15 +94,14 @@ router.post('/remove', (req, res, next)=>{
         field1.subfield: 1      // Удалить это поле
       }
   */
-  console.log('UPDATE req.body', req.body)
-  var filter = {'username':req.session.user.name};
+  console.log('REMOVE req.body', req.body)
+  var filter = {'email.value':req.session.user.email};
   var data = req.body;
   db
     .remove(db.users_database, db.users_collection, filter, data)
     .then((results)=>{
-      //console.log('UPDATE results', results)
       if (!!results){
-        res.send({status: 200, message: "Данные удалены"});
+        res.send({message: "Данные удалены"});
       } else {
         const err = new Error('Данные не найдены!');
         err.status = 400;

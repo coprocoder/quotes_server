@@ -51,7 +51,7 @@ router.post('/create', (req, res, next)=>{
     .then((results)=>{
       //console.log('CREATE results', results)
       if (!!results){
-        res.send({status: 200, message: "Пользователь создан", user:results.ops[0]});
+        res.send({message: "Пользователь создан", user:results.ops[0]});
       } else {
         const err = new Error('Данные не найдены!');
         err.status = 400;
