@@ -33,32 +33,6 @@ router.post('/get', (req, res, next)=>{
     })
 })
 
-// Get user by id
-router.post('/get_by_id', (req, res, next)=>{
-  /*
-      req.body ex: {
-        "id": "60a23286b9c5fe268c57b69e"
-      }
-  */
-  console.log('GETbyID req.body', req.body)
-  var id = req.body.id;
-  db
-    .getById(db.users_database, db.users_collection, id)
-    .then((results)=>{
-      console.log('GET results', results)
-      if (!!results){
-        res.send(results[0]);
-      } else {
-        const err = new Error('Данные не найдены!');
-        err.status = 400;
-          next(err);
-      }
-    })
-    .catch((err)=>{
-      next(err);
-    })
-})
-
 // Update field by existed user
 router.post('/update', (req, res, next)=>{
   /*

@@ -20,9 +20,9 @@ router.post('/get', (req, res, next)=>{
   */
   console.log('GET req.body', req.body)
   var filter = req.body.filter;
-  var data = req.body.data;
+  var fields = req.body.fields;
   db
-    .get(db.users_database, db.users_collection, filter, data)
+    .get(db.users_database, db.users_collection, filter, fields)
     .then((results)=>{
       console.log('GET results', results)
       if (!!results){
@@ -37,8 +37,6 @@ router.post('/get', (req, res, next)=>{
       next(err);
     })
 })
-
-
 
 /* === NEW ITEMS BLOCK === */
 

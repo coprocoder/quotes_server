@@ -10,37 +10,15 @@ module.exports.secure_collection = 'users';
 
 const conversion = require('../db/data_conversion');
 
-
-module.exports.getById = function(cur_db, cur_collection, cur_id) {
-  return new Promise((resolve, reject) => {
-    const id = new ObjectID(cur_id);
-    MongoClient
-      .connect(url, function(err, client) {
-        if (err) {
-            reject(err);
-        }
-        client
-          .db(cur_db)
-          .collection(cur_collection)
-          .find({ _id: id })
-          .toArray(function(err, results){
-            if (err) {
-                reject(err);
-            }
-            client.close();
-            resolve(results);
-          })
-    });
-  })
-}
-
-
 /* === Select from current logged user === */
 
 // Get fields by path
 module.exports.get = function(cur_db, cur_collection, filter, fields) {
   console.log('GET FILTER', filter)
   console.log('GET FIELDS', fields)
+
+  filter._id = new ObjectID(filter._id);
+
   return new Promise((resolve, reject) => {
     MongoClient
       .connect(url, function(err, client) {
