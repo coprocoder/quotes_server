@@ -29,7 +29,7 @@ app.use(express.json()); // Для просмотра request.body в POST
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
 
-//### Logging
+//### Logging of visits
 app.use(function(req, res, next){
     let now = new Date();
 
@@ -41,7 +41,9 @@ app.use(function(req, res, next){
     let hour = now.getHours();
     let minutes = now.getMinutes();
     let seconds = now.getSeconds();
+
     let data = `${day}.${month}.${year} ${hour}:${minutes}:${seconds} ${req.method} ${req.url} ${req.get("user-agent")}`;
+
     fs.appendFile("server.log", data + "\n", function(){});
     next();
 });
@@ -137,7 +139,6 @@ app.use('/', indexRouter);              // Корень, базовые стра
 app.use('/auth/', authRouter);          // Авторизация/регистрация
 app.use('/account/', curUserRouter);    // Текущий пользователь
 app.use('/users/', anyUserRouter);      // Все пользователи
-
 
 
 /* ### === Error handlers block === */

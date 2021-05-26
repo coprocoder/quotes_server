@@ -86,7 +86,7 @@ router.post('/signup', (req, res, next)=>{
       -email
   */
   console.log('signup req.body', req.body)
-  var timestamp = new Date().getTime();
+  var servertime = new Date().getTime();
   var filter = {"email": req.body.email};
   var fields = {};
   db
@@ -97,7 +97,7 @@ router.post('/signup', (req, res, next)=>{
         data = {
           email: {
               'value': req.body.email,
-              'uptime': timestamp
+              'time': servertime
           }
         };
         // Записываем данные в обычную БД
@@ -117,11 +117,11 @@ router.post('/signup', (req, res, next)=>{
             secure_data = {
               user_id: {
                   'value': new_user._id,
-                  'uptime': timestamp
+                  'time': servertime
               },
               password: {
                   'value': conversion.createHash(req.body.password),
-                  'uptime': timestamp
+                  'time': servertime
               }
             };
             // Записываем пароль в секретную БД
