@@ -107,13 +107,16 @@ router.post('/update', (req, res, next)=>{
       // Достаём нужное поле по URL
       let urls = req.body.url.split('.')
       let get_result_field = get_results[0]
-      if(get_results[0].length > 1)
-          for (i in urls)
-              get_result_field = get_result_field[urls[i]]
+      if(get_results.length > 0)
+          for (i in urls) {
+             console.log('urls[i]',urls[i])
+             get_result_field = get_result_field[urls[i]]
+          }
       console.log('UPDATE get_result_field', get_result_field)
 
       // Если поле найдено, то обновляем его
-      if(!!get_result_field && get_result_field.length > 1) { // length > 1 т.к. при GET несуществующего объекта возвращается метаобъект с полем ID
+//      if(!!get_result_field && get_result_field.length > 1) { // length > 1 т.к. при GET несуществующего объекта возвращается метаобъект с полем ID
+      if(!!get_result_field) { // length > 1 т.к. при GET несуществующего объекта возвращается метаобъект с полем ID
         // Если данные на сервере не актуальны, то обновляем их
         if(get_result_field.time < req.body.devicetime){
           db
@@ -175,36 +178,5 @@ router.post('/update', (req, res, next)=>{
       next(err);
     })
 })
-
-// Update field by existed user
-router.post('/remove', (req, res, next)=>{
-  /*
-      req.body ex: {
-        "url":"field1.subfield"   // Удалить это поле
-      }
-  */
-  console.log('REMOVE req.body', req.body)
-  var filter = {'email.value':req.session.user.email};
-  var fields = {}
-  if(!!req.body.url)
-    fields = { [req.body.url]: 1};
-  console.log('REMOVE fields', fields)
-  db
-    .remove(db.users_database, db.users_collection, filter, fields)
-    .then((results)=>{
-      if (!!results){
-        console.log('REMOVE results', results)
-        res.send({message: "Данные удалены"});
-      } else {
-        const err = new Error('Данные не найдены!');
-        err.status = 400;
-          next(err);
-      }
-    })
-    .catch((err)=>{
-      next(err);
-    })
-})
-
 
 module.exports = router;
