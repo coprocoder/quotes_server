@@ -54,18 +54,14 @@ var sess = {
     cookie: {
         path: '/',          // где действует
         httpOnly: true,     // чтобы куку не могли читать на клиенте
-        maxAge: new Date(Date.now() + 3600000)        // время жизни куки в милисекундах(null = infinity)
+//        maxAge: new Date(Date.now() + 30000)        // время жизни куки в милисекундах(null = infinity)
     },
     saveUninitialized: false,
     store: new MongoStore({
         url: 'mongodb://localhost:27017/usersdb'
-    })
-//    store: new MongoStore({
-//      "db" : "usersdb",
-//      "collection" : "sessions",
-//      "host" : "localhost",
-//      "port" : 27017
-//    })
+    }),
+    duration: 30 * 60 * 1000,
+    activeDuration: 5 * 60 * 1000
 }
 if (app.get('env') === 'production') {
   app.set('trust proxy', 1) // trust first proxy
@@ -116,6 +112,19 @@ let strategy = new Strategy(params, function(payload, done){
     })
 })
 passport.use(strategy);
+
+//### Check auth (on all route except route /auth) = /\/((?!route1|route2).)*/
+app.use(/\/((?!auth).)*/, function(req, res, next){
+  console.log('middleware req.session', req.session)
+  if (!!req.session.user){
+    next();
+  }
+  else {
+    const err = new Error('Ошибка авторизации!');
+    err.status = 401;
+    next(err);
+  }
+});
 
 //### Routers Files
 var indexRouter = require('./routes/index');

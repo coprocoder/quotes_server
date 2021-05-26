@@ -27,19 +27,20 @@ router.post('/login', (req, res, next)=>{
         -email
         -password
   */
+
   console.log('login req.body', req.body)
   var filter = {"email.value": req.body.email};
   var fields = {};
   db
     .get(db.users_database, db.users_collection, filter, fields)
     .then((user_results)=>{
-      console.log('login results', user_results)
+      //console.log('login results', user_results)
       if(user_results.length > 0) {
         var filter = {"user_id.value": user_results[0]._id};
         db
           .get(db.secure_database, db.secure_collection, filter, fields)
           .then((secure_results)=>{
-            console.log('login secure results', secure_results)
+            //console.log('login secure results', secure_results)
             if (conversion.isValidPassword(req.body.password, secure_results[0].password.value)) {
               let payload ={
                 id: user_results[0]._id
@@ -47,8 +48,8 @@ router.post('/login', (req, res, next)=>{
               let token = jwt.encode(payload, config.secret);
               req.session.user = {id: user_results[0]._id, email: user_results[0].email.value}
               req.session.save()  // Сохранение сессии в БД mongoStore
+              console.log('login req.session', req.session)
               res.json({status: 200, token: token});
-
             }
             else {
               const err = new Error('Не верный логин или пароль!');
@@ -92,12 +93,14 @@ router.post('/signup', (req, res, next)=>{
     .get(db.users_database, db.users_collection, filter, fields)
     .then((results)=>{
       if (results.length == 0){
+        // Собираем данные для регистрации
         data = {
           email: {
               'value': req.body.email,
               'uptime': timestamp
           }
         };
+        // Записываем данные в обычную БД
         db
           .create(db.users_database,db.users_collection, data)
           .then((results)=>{
@@ -110,6 +113,7 @@ router.post('/signup', (req, res, next)=>{
             req.session.save()  // Сохранение сессии в БД mongoStore
             console.log('sess', req.session)
 
+            // Собираем секретные данные для регистрации (пароль)
             secure_data = {
               user_id: {
                   'value': new_user._id,
@@ -120,7 +124,7 @@ router.post('/signup', (req, res, next)=>{
                   'uptime': timestamp
               }
             };
-
+            // Записываем пароль в секретную БД
             db
               .create(db.secure_database,db.secure_collection, secure_data)
               .then((results)=>{

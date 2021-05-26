@@ -10,14 +10,16 @@ module.exports.secure_collection = 'users';
 
 const conversion = require('../db/data_conversion');
 
+
 /* === Select from current logged user === */
 
 // Get fields by path
 module.exports.get = function(cur_db, cur_collection, filter, fields) {
-  console.log('GET FILTER', filter)
-  console.log('GET FIELDS', fields)
+  console.log('db GET FILTER', filter)
+  console.log('db GET FIELDS', fields)
 
-  filter._id = new ObjectID(filter._id);
+  if(!!filter._id)
+    filter._id = new ObjectID(filter._id);
 
   return new Promise((resolve, reject) => {
     MongoClient
@@ -45,8 +47,8 @@ module.exports.get = function(cur_db, cur_collection, filter, fields) {
 
 // Update field by path
 module.exports.update = function(cur_db, cur_collection, filter, fields) {
-  console.log('UPDATE FILTER', filter)
-  console.log('UPDATE FIELDS', fields)
+  console.log('db UPDATE FILTER', filter)
+  console.log('db UPDATE FIELDS', fields)
 
   return new Promise((resolve, reject) => {
     MongoClient
@@ -79,8 +81,8 @@ module.exports.update = function(cur_db, cur_collection, filter, fields) {
 
 // Remove field by path
 module.exports.remove = function(cur_db, cur_collection, filter, fields) {
-  console.log('DELETE FILTER', filter)
-  console.log('DELETE FIELDS', fields)
+  console.log('db DELETE FILTER', filter)
+  console.log('db DELETE FIELDS', fields)
   return new Promise((resolve, reject) => {
     MongoClient
       .connect(url, function(err, client) {
@@ -109,7 +111,7 @@ module.exports.remove = function(cur_db, cur_collection, filter, fields) {
 /* === NEW ITEMS BLOCK === */
 
 module.exports.create = function(cur_db, cur_collection, data) {
-  console.log('CREATE DATA', data)
+  console.log('db CREATE DATA', data)
   return new Promise((resolve, reject) => {
     MongoClient
       .connect(url, function(err, client) {
@@ -133,7 +135,7 @@ module.exports.create = function(cur_db, cur_collection, data) {
 }
 
 module.exports.delete = function(cur_db, cur_collection, data) {
-  console.log('DELETE DATA', data)
+  console.log('db DELETE DATA', data)
   return new Promise((resolve, reject) => {
     MongoClient
       .connect(url, function(err, client) {
