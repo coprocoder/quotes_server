@@ -18,13 +18,13 @@ router.post('/get', (req, res, next)=>{
       }
     }
   */
-  console.log('GET req.body', req.body)
+  console.log('GET ANY req.body', req.body)
   var filter = req.body.filter;
   var fields = req.body.fields;
   db
     .get(db.users_database, db.users_collection, filter, fields)
     .then((results)=>{
-      console.log('GET results', results)
+      console.log('GET ANY results', results)
       if (!!results){
         res.send(results);
       } else {
@@ -44,20 +44,20 @@ router.post('/get', (req, res, next)=>{
 
 // Create new user
 router.post('/create', (req, res, next)=>{
-  console.log('CREATE req.body', req.body)
+  console.log('CREATE ANY req.body', req.body)
   res.redirect(307, "../../auth/signup") // 307 не меняет метод и тело при редиректе
 })
 
 // Delete existed user
 router.post('/delete', (req, res, next)=>{
-  console.log('DELETE req.body', req.body)
+  console.log('DELETE ANY req.body', req.body)
   var filter = req.body;
   var fields = {};
   db
     // Ищем объект для удаления
     .get(db.users_database, db.users_collection, filter, fields)
     .then((get_results)=>{
-      console.log('DELETE USER results', get_results)
+      console.log('DELETE ANY USER results', get_results)
       db
         // Удаляем объекта из обычной БД
         .delete(db.users_database, db.users_collection, filter)

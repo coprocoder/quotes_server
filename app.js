@@ -52,20 +52,22 @@ app.use(function(req, res, next){
 var sess = {
     secret: 'super_secret_word', // секретное слово для шифрования
     credentials: 'include',
-    resave: false,            // имя куки
+    resave: false,
+    saveUninitialized: false,
     cookie: {
         path: '/',          // где действует
         httpOnly: true,     // чтобы куку не могли читать на клиенте
-//        maxAge: new Date(Date.now() + 30000)        // время жизни куки в милисекундах(null = infinity)
+
+        // время жизни куки в милисекундах(null = infinity, 3600000 = 1 Hour)
+//        expires : new Date(Date.now() + 30000),
+        expires: false
     },
-    saveUninitialized: false,
     store: new MongoStore({
         url: 'mongodb://localhost:27017/usersdb'
-    }),
-    duration: 30 * 60 * 1000,
-    activeDuration: 5 * 60 * 1000
+    })
 }
 if (app.get('env') === 'production') {
+  console.log('== production server ==')
   app.set('trust proxy', 1) // trust first proxy
   sess.cookie.secure = true // serve secure cookies
 }
@@ -73,7 +75,6 @@ app.use(session(sess))
 
 //### Запись и хранение данных в куки
 app.all('/', function (req, res, next) {
-
     // в независимости от логина или нет получаем id
     console.log(req.sessionID);
 
@@ -83,42 +84,10 @@ app.all('/', function (req, res, next) {
     next();
 })
 
-//### Конфигурация Passport
-var passport = require('passport');
-var passportJWT = require('passport-jwt');
-var ExtractJWT = passportJWT.ExtractJwt;
-var Strategy = passportJWT.Strategy;
-
-var db = require('./db/db');
-var config = require('./config/config');
-
-const params = {
-  secretOrKey: config.secret,
-  jwtFromRequest: ExtractJWT.fromAuthHeaderAsBearerToken()
-};
-
-let strategy = new Strategy(params, function(payload, done){
-  db
-    .getUserId(payload.id)
-    .then((results)=>{
-      if (results.length == 0) {
-        return done(new Error('Юзер не найден'), null)
-      } else {
-        return done(null, {
-          id: results._id
-        })
-      }
-    })
-    .catch((err)=>{
-      return done(err);
-    })
-})
-passport.use(strategy);
-
 //### Check auth (on all route except route /auth) = /\/((?!route1|route2).)*/
 app.use(/\/((?!auth).)*/, function(req, res, next){
   console.log('middleware req.session', req.session)
-  if (!!req.session.user){
+  if (req.session.isLogged){
     next();
   }
   else {

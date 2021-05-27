@@ -5,19 +5,6 @@ const conversion = require('../db/data_conversion');
 
 const jwt = require('jwt-simple');
 const config = require('../config/config');
-let passport = require('passport');
-
-auth = passport.authenticate('jwt', {
-  session: false
-});
-
-/* Simple example auth secured route */
-router.get('/secret', auth, (req, res)=>{
-  res.json({
-    message: 'Секретная страница!'
-  })
-});
-
 
 /* ### === Authorization block === */
 
@@ -27,7 +14,6 @@ router.post('/login', (req, res, next)=>{
         -email
         -password
   */
-
   console.log('login req.body', req.body)
   var filter = {"email.value": req.body.email};
   var fields = {};
@@ -47,6 +33,7 @@ router.post('/login', (req, res, next)=>{
               }
               let token = jwt.encode(payload, config.secret);
               req.session.user = {id: user_results[0]._id, email: user_results[0].email.value}
+              req.session.isLogged = true;
               req.session.save()  // Сохранение сессии в БД mongoStore
               console.log('login req.session', req.session)
               res.json({status: 200, token: token});
@@ -73,10 +60,14 @@ router.post('/login', (req, res, next)=>{
 })
 
 router.post('/logout', (req, res, next)=>{
-    req.logout();
-    if (req.session.user)
-		delete req.session.user;
-    res.json({status: 200, msg:'logout succesfull'});
+    console.log('logout req.session BEFORE', req.session)
+    req.session.regenerate(function(){
+      req.logout()
+      if (req.session.user)
+	  	delete req.session.user;
+      req.session.isLogged = false;
+      res.json({status: 200, msg:'logout succesfull'});
+    })
 });
 
 router.post('/signup', (req, res, next)=>{

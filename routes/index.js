@@ -12,6 +12,11 @@ router.get('/', (req, res)=>{
   res.render('index', { user: req.session.user });
 });
 
+router.post('/test', (req, res)=>{
+  console.log("== test route ===")
+  res.send(req.session);
+});
+
 /* Simple example auth secured route */
 //router.get('/secret', auth.is_auth, (req, res)=>{
 //  res.json({
