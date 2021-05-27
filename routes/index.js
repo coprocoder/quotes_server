@@ -17,6 +17,11 @@ router.post('/test', (req, res)=>{
   res.send(req.session);
 });
 
+router.post('/session', (req, res)=>{
+  console.log("== session route ===")
+  res.send(req.session);
+});
+
 /* Simple example auth secured route */
 //router.get('/secret', auth.is_auth, (req, res)=>{
 //  res.json({

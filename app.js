@@ -52,19 +52,21 @@ app.use(function(req, res, next){
 var sess = {
     secret: 'super_secret_word', // секретное слово для шифрования
     credentials: 'include',
-    resave: false,
+    resave: true,
     saveUninitialized: false,
     cookie: {
         path: '/',          // где действует
         httpOnly: true,     // чтобы куку не могли читать на клиенте
 
         // время жизни куки в милисекундах(null = infinity, 3600000 = 1 Hour)
-//        expires : new Date(Date.now() + 30000),
-        expires: false
+//        expires: new Date(Date.now() + 30000), // не работает, дата устанавливается на момент запуска сервера, время жизни отрицательное
+//        expires: false // infinity live time   // сессии не убиваются
+        expires : 30000,
     },
     store: new MongoStore({
         url: 'mongodb://localhost:27017/usersdb'
-    })
+    }),
+    rolling: true,
 }
 if (app.get('env') === 'production') {
   console.log('== production server ==')
@@ -87,14 +89,16 @@ app.all('/', function (req, res, next) {
 //### Check auth (on all route except route /auth) = /\/((?!route1|route2).)*/
 app.use(/\/((?!auth).)*/, function(req, res, next){
   console.log('middleware req.session', req.session)
-  if (req.session.isLogged){
-    next();
-  }
-  else {
-    const err = new Error('Ошибка авторизации!');
-    err.status = 401;
-    next(err);
-  }
+  req.session.reload(function(err) {
+    if (req.session.isLogged){
+      next();
+    }
+    else {
+      const err = new Error('Ошибка авторизации!');
+      err.status = 401;
+      next(err);
+    }
+  })
 });
 
 //### Routers Files

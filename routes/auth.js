@@ -61,13 +61,10 @@ router.post('/login', (req, res, next)=>{
 
 router.post('/logout', (req, res, next)=>{
     console.log('logout req.session BEFORE', req.session)
-    req.session.regenerate(function(){
-      req.logout()
-      if (req.session.user)
-	  	delete req.session.user;
-      req.session.isLogged = false;
-      res.json({status: 200, msg:'logout succesfull'});
-    })
+    req.session.isLogged = false;
+    if (req.session.user)
+		delete req.session.user;
+    res.json({status: 200, msg:'logout succesfull'});
 });
 
 router.post('/signup', (req, res, next)=>{
