@@ -1,4 +1,5 @@
 var createError = require('http-errors');
+const cors = require('cors');
 var express = require('express');
 var path = require('path');
 var fs = require('fs');
@@ -13,6 +14,8 @@ var session = require('express-session')
 var MongoStore = require('connect-mongo')(session);
 
 var app = express();
+app.use(cors());
+app.options('*', cors());
 
 //### view engine setup
 app.engine('html', cons.swig)
