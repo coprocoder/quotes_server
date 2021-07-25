@@ -36,7 +36,10 @@ router.post('/login', (req, res, next)=>{
               req.session.isLogged = true;
               req.session.save()  // Сохранение сессии в БД mongoStore
               console.log('login req.session', req.session)
-              res.json({status: 200, token: token});
+              res.json({
+                token: token, 
+                user: user_results[0]
+              });
             }
             else {
               const err = new Error('Не верный логин или пароль!');
@@ -64,7 +67,7 @@ router.post('/logout', (req, res, next)=>{
     req.session.isLogged = false;
     if (req.session.user)
 		delete req.session.user;
-    res.json({status: 200, msg:'logout succesfull'});
+    res.json({msg:'logout succesfull'});
 });
 
 router.post('/signup', (req, res, next)=>{
@@ -117,8 +120,6 @@ router.post('/signup', (req, res, next)=>{
               .create(db.secure_database,db.secure_collection, secure_data)
               .then((results)=>{
                 res.json({
-                  status: 200,
-                  message: 'Пользователь добавлен',
                   user_id: new_user._id,
                   token: token
                 })
