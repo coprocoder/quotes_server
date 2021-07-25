@@ -19,8 +19,6 @@ router.post('/get', (req, res, next)=>{
   console.log('GET CUR req.body', req.body)
   var filter = {'email.value': req.session.user.email};
   var fields = {}
-  if(!!req.body.url)
-    fields = { [req.body.url]: 1};
 
   db
     .get(db.users_database, db.users_collection, filter, fields)
@@ -28,12 +26,17 @@ router.post('/get', (req, res, next)=>{
       console.log('GET CUR results', results)
 
       // Достаём по url нужное вложенное поле из результата
-      let urls = req.body.url.split('.')
       let results_found_field = results[0]
-
-      if(req.body.url.length > 0)
+      let urls
+      
+      if(!!req.body.url) {
+        fields = { [req.body.url]: 1};
+        if(req.body.url.length > 0){
+          urls  = req.body.url.split('.')
           for (i in urls)
               results_found_field = results_found_field[urls[i]]
+        }
+      }
       console.log('GET CUR ans', results_found_field)
 
       if (!!results_found_field){
