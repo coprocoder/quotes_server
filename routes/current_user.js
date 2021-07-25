@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db/db');
 
+const jwt = require('jwt-simple');
+const config = require('../config/config');
 
 /* === Select from current logged user === */
 
@@ -17,7 +19,10 @@ router.post('/get', (req, res, next)=>{
   */
   //console.log('GET req.session', req.session)
   console.log('GET CUR req.body', req.body)
-  var filter = {'email.value': req.session.user.email};
+  
+  //var filter = {'email.value': req.session.user.email};
+  var token_data = jwt.decode(req.headers.authorization, config.secret, false, 'HS256')
+  var filter = {'email.value': token_data.email};
   var fields = {}
 
   db

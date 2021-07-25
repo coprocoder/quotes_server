@@ -17,25 +17,31 @@ router.post('/login', (req, res, next)=>{
   console.log('login req.body', req.body)
   var filter = {"email.value": req.body.email};
   var fields = {};
+  
+  // Стучимся в публичную БД
   db
     .get(db.users_database, db.users_collection, filter, fields)
     .then((user_results)=>{
-      //console.log('login results', user_results)
       if(user_results.length > 0) {
         var filter = {"user_id.value": user_results[0]._id};
+
+        // Стучимся в приватную БД
         db
           .get(db.secure_database, db.secure_collection, filter, fields)
           .then((secure_results)=>{
-            //console.log('login secure results', secure_results)
             if (conversion.isValidPassword(req.body.password, secure_results[0].password.value)) {
+              // Данные внутри токена
               let payload ={
-                id: user_results[0]._id
+                id: user_results[0]._id,
+                email:user_results[0].email.value
               }
               let token = jwt.encode(payload, config.secret);
+              
               req.session.user = {id: user_results[0]._id, email: user_results[0].email.value}
               req.session.isLogged = true;
               req.session.save()  // Сохранение сессии в БД mongoStore
               console.log('login req.session', req.session)
+              
               res.json({
                 token: token, 
                 user: user_results[0]
@@ -96,6 +102,7 @@ router.post('/signup', (req, res, next)=>{
           .create(db.users_database,db.users_collection, data)
           .then((results)=>{
             var new_user = results.ops[0]
+            
             let payload ={
               id: new_user._id
             }

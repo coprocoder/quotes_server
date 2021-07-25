@@ -90,19 +90,19 @@ app.all('/', function (req, res, next) {
 })
 
 //### Check auth (on all route except route /auth) = /\/((?!route1|route2).)*/
-app.use(/\/((?!auth).)*/, function(req, res, next){
-  console.log('middleware req.session', req.session)
-  req.session.reload(function(err) {
-    if (req.session.isLogged){
-      next();
-    }
-    else {
-      const err = new Error('Ошибка авторизации!');
-      err.status = 401;
-      next(err);
-    }
-  })
-});
+// app.use(/\/((?!auth).)*/, function(req, res, next){
+//   console.log('middleware req.session', req.session)
+//   req.session.reload(function(err) {
+//     if (req.session.isLogged){
+//       next();
+//     }
+//     else {
+//       const err = new Error('Ошибка авторизации!');
+//       err.status = 401;
+//       next(err);
+//     }
+//   })
+// });
 
 //### Routers Files
 var indexRouter = require('./routes/index');
