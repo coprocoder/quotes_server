@@ -2,6 +2,8 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db/db');
 
+const jwt = require('jwt-simple');
+const config = require('../config/config');
 
 /* === Select from current logged user === */
 
@@ -15,12 +17,15 @@ router.post('/get', (req, res, next)=>{
     IF client time == server time return {value:null, time:null}
     ELSE if < then return {value:db_value, time: db_time}
   */
+
   //console.log('GET req.session', req.session)
+  console.log('GET CUR req.head', req.headers.authorization)
   console.log('GET CUR req.body', req.body)
-  var filter = {'email.value': req.session.user.email};
+  
+  //var filter = {'email.value': req.session.user.email};
+  var token_data = jwt.decode(req.headers.authorization, config.secret, false, 'HS256')
+  var filter = {'email.value': token_data.email};
   var fields = {}
-  if(!!req.body.url)
-    fields = { [req.body.url]: 1};
 
   db
     .get(db.users_database, db.users_collection, filter, fields)
@@ -28,12 +33,17 @@ router.post('/get', (req, res, next)=>{
       console.log('GET CUR results', results)
 
       // Достаём по url нужное вложенное поле из результата
-      let urls = req.body.url.split('.')
       let results_found_field = results[0]
-
-      if(req.body.url.length > 0)
+      let urls
+      
+      if(!!req.body.url) {
+        fields = { [req.body.url]: 1};
+        if(req.body.url.length > 0){
+          urls  = req.body.url.split('.')
           for (i in urls)
               results_found_field = results_found_field[urls[i]]
+        }
+      }
       console.log('GET CUR ans', results_found_field)
 
       if (!!results_found_field){
