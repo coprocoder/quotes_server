@@ -8,6 +8,8 @@ module.exports.users_collection = 'users';
 module.exports.secure_database = 'securedb';
 module.exports.secure_collection = 'users';
 
+module.exports.public_database = 'publicdb';
+
 const conversion = require('../db/data_conversion');
 
 

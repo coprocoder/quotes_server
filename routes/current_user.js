@@ -24,6 +24,7 @@ router.post('/get', (req, res, next)=>{
   
   //var filter = {'email.value': req.session.user.email};
   var token_data = jwt.decode(req.headers.authorization, config.secret, false, 'HS256')
+  console.log('GET CUR token_data', token_data)
   var filter = {'email.value': token_data.email};
   var fields = {}
 
