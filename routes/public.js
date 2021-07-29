@@ -29,4 +29,25 @@ router.get('/projects', (req, res, next)=>{
     })
 });
 
+router.get('/mobile_imgs', (req, res, next)=>{
+  console.log('mobile_imgs')
+  var filter = {};
+  var fields = {};
+  
+  // Стучимся в публичную БД
+  db
+    .get(db.public_database, "mobile_app_imgs", filter, fields)
+    .then((result)=>{
+      if(result.length > 0) {
+        res.send({'data':result})
+      }
+      else {
+        res.send({'message':'Изображения отсутствуют'});
+      }
+    })
+    .catch((err)=>{
+      next(err);
+    })
+});
+
 module.exports = router;
