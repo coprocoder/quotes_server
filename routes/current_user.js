@@ -25,7 +25,7 @@ router.post('/get', (req, res, next)=>{
   //var filter = {'email.value': req.session.user.email};
   var token_data = jwt.decode(req.headers.authorization, config.secret, false, 'HS256')
   console.log('GET CUR token_data', token_data)
-  var filter = {'email.value': token_data.email};
+  var filter = {'_id': token_data.id};
   var fields = {}
 
   db
@@ -48,13 +48,17 @@ router.post('/get', (req, res, next)=>{
       console.log('GET CUR ans', results_found_field)
 
       if (!!results_found_field){
-        if(req.body.time < results_found_field.time || req.body.time == null)
+        if(req.body.time < results_found_field.time || req.body.time == null) {
+          for(key in results_found_field)
+            results_found_field[key] = results_found_field[key].value
             res.send(results_found_field);
-        else
+        }
+        else {
             res.send({
                 'value':null,
                 'time':null
             })
+        }
       } else {
         res.send({value:null});
         //const err = new Error('Данные не найдены!');

@@ -95,6 +95,14 @@ router.post('/signup', (req, res, next)=>{
           email: {
               'value': req.body.email,
               'time': servertime
+          },
+          username: {
+            'value': req.body.username,
+            'time': servertime
+          },
+          role: {
+            'value': 0,
+            'time': servertime
           }
         };
         // Записываем данные в обычную БД
