@@ -4,7 +4,6 @@ var express = require('express');
 var path = require('path');
 var fs = require('fs');
 var cookieParser = require('cookie-parser');
-var bodyParser = require('body-parser');        // Для просмотра request.body в POST
 var logger = require('morgan');
 var cons = require('consolidate');
 

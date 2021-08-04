@@ -30,10 +30,12 @@ router.post('/login', (req, res, next)=>{
           .get(db.secure_database, db.secure_collection, filter, fields)
           .then((secure_results)=>{
             if (conversion.isValidPassword(req.body.password, secure_results[0].password.value)) {
+
               // Данные внутри токена
               let payload ={
                 id: user_results[0]._id,
-                email:user_results[0].email.value
+                email:user_results[0].email.value,
+                role: secure_results[0].role.value
               }
               let token = jwt.encode(payload, config.secret);
               
@@ -91,7 +93,7 @@ router.post('/signup', (req, res, next)=>{
     .then((results)=>{
       if (results.length == 0){
         // Собираем данные для регистрации
-        data = {
+        let data = {
           email: {
               'value': req.body.email,
               'time': servertime
@@ -120,13 +122,17 @@ router.post('/signup', (req, res, next)=>{
             console.log('sess', req.session)
 
             // Собираем секретные данные для регистрации (пароль)
-            secure_data = {
+            let secure_data = {
               user_id: {
                   'value': new_user._id,
                   'time': servertime
               },
               password: {
                   'value': conversion.createHash(req.body.password),
+                  'time': servertime
+              },
+              role: {
+                  'value': 0,
                   'time': servertime
               }
             };

@@ -31,6 +31,40 @@ router.get('/projects', (req, res, next)=>{
 });
 
 router.post('/projects', (req, res, next)=>{
+  /* Create project */
+
+  var servertime = new Date().getTime();
+
+  console.log('new_project req.body', req.body)
+
+  // Собираем данные для регистрации
+  let data = {
+    title: {
+        'value': req.body.title,
+        'time': servertime
+    },
+    note: {
+      'value': req.body.note,
+      'time': servertime
+    },
+    text: {
+      'value': req.body.text,
+      'time': servertime
+    }
+  };
+
+  // Записываем данные в обычную БД
+  db
+    .create(db.public_database,"projects", data)
+    .then((results)=>{
+      console.log('projects created', results.ops[0])
+    })
+    .catch((err)=>{
+      next(err);
+    })
+})
+
+router.put('/projects', (req, res, next)=>{
   console.log('projects')
 
   var filter = {'_id': ObjectId(req.body.id) };
@@ -94,6 +128,57 @@ router.post('/projects', (req, res, next)=>{
     }
   })
 });
+
+router.delete('/projects', (req, res, next)=>{
+  console.log('projects')
+
+  var filter = {'_id': ObjectId(req.body.id) };
+  var get_fields = null
+
+  // Преобразовываем входные данные в данные для NoSQL запроса
+  if(!!req.body.url) {
+    get_fields = { [req.body.url]: 1};
+  }
+  else{
+     res.send({
+          message: "Фильтр данных не задан",
+          code: -1,
+          time: null
+        });
+  }
+  
+  // Стучимся в публичную БД
+  db
+  .get(db.public_database, "projects", filter, get_fields)
+  .then((get_results)=>{
+    console.log('DELETE PROJECT get_results', get_results)
+    
+    // Если объект найден, то удаляем его
+    if(!!get_results) {
+      db
+        .delete(db.public_database, "projects", filter, get_results)
+        .then((results)=>{
+          console.log('DELETE PROJECT result')
+          if (!!results){
+            res.send({
+              message: "Данные удалены",
+              code: 0
+            });
+          } else {
+            const err = new Error('Данные не удалены!');
+            err.status = 400;
+            next(err);
+          }
+        })
+        .catch((err)=>{
+          next(err);
+        })
+    }
+  })
+});
+
+
+
 
 router.get('/mobile_imgs', (req, res, next)=>{
   console.log('mobile_imgs')
