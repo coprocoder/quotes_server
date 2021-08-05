@@ -38,19 +38,25 @@ router.post('/projects', (req, res, next)=>{
   console.log('new_project req.body', req.body)
 
   // Собираем данные для регистрации
+  // let data = {
+  //   title: {
+  //       'value': req.body.title,
+  //       'time': servertime
+  //   },
+  //   note: {
+  //     'value': req.body.note,
+  //     'time': servertime
+  //   },
+  //   text: {
+  //     'value': req.body.text,
+  //     'time': servertime
+  //   }
+  // };
+
   let data = {
-    title: {
-        'value': req.body.title,
-        'time': servertime
-    },
-    note: {
-      'value': req.body.note,
-      'time': servertime
-    },
-    text: {
-      'value': req.body.text,
-      'time': servertime
-    }
+    title: req.body.title,
+    note: req.body.note,
+    text: req.body.text
   };
 
   // Записываем данные в обычную БД

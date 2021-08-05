@@ -34,6 +34,7 @@ router.post('/login', (req, res, next)=>{
               // Данные внутри токена
               let payload ={
                 id: user_results[0]._id,
+                username: user_results[0].username.value,
                 email:user_results[0].email.value,
                 role: secure_results[0].role.value
               }
@@ -46,7 +47,7 @@ router.post('/login', (req, res, next)=>{
               
               res.json({
                 token: token, 
-                user: user_results[0]
+                user: payload
               });
             }
             else {
@@ -101,10 +102,6 @@ router.post('/signup', (req, res, next)=>{
           username: {
             'value': req.body.username,
             'time': servertime
-          },
-          role: {
-            'value': 0,
-            'time': servertime
           }
         };
         // Записываем данные в обычную БД
@@ -114,7 +111,9 @@ router.post('/signup', (req, res, next)=>{
             var new_user = results.ops[0]
             
             let payload ={
-              id: new_user._id
+              id: new_user._id,
+              email:new_user.email.value,
+              role: 0
             }
             let token = jwt.encode(payload, config.secret);
             req.session.user = {id: new_user._id, email: new_user.email.value}
@@ -132,7 +131,7 @@ router.post('/signup', (req, res, next)=>{
                   'time': servertime
               },
               role: {
-                  'value': 0,
+                  'value': 1,
                   'time': servertime
               }
             };

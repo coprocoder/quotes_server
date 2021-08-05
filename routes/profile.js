@@ -45,6 +45,7 @@ router.post('/get', (req, res, next)=>{
               results_found_field = results_found_field[urls[i]]
         }
       }
+
       console.log('GET CUR ans', results_found_field)
 
       if (!!results_found_field){
@@ -61,9 +62,6 @@ router.post('/get', (req, res, next)=>{
         }
       } else {
         res.send({value:null});
-        //const err = new Error('Данные не найдены!');
-        //err.status = 400;
-        //  next(err);
       }
     })
     .catch((err)=>{
