@@ -47,7 +47,7 @@ router.post('/login', (req, res, next)=>{
               
               res.json({
                 token: token, 
-                user: payload
+                //user: payload
               });
             }
             else {

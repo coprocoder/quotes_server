@@ -19,11 +19,11 @@ router.post('/get', (req, res, next)=>{
   */
 
   //console.log('GET req.session', req.session)
-  console.log('GET CUR req.head', req.headers.authorization)
+  console.log('GET CUR req.head', req.headers.auth)
   console.log('GET CUR req.body', req.body)
   
   //var filter = {'email.value': req.session.user.email};
-  var token_data = jwt.decode(req.headers.authorization, config.secret, false, 'HS256')
+  var token_data = jwt.decode(req.headers.auth, config.secret, false, 'HS256')
   console.log('GET CUR token_data', token_data)
   var filter = {'_id': token_data.id};
   var fields = {}
