@@ -19,11 +19,10 @@ router.post('/get', (req, res, next)=>{
   */
 
   //console.log('GET req.session', req.session)
-  console.log('GET CUR req.head', req.headers.authorization)
+  console.log('GET CUR req.head.auth', req.headers.auth)
   console.log('GET CUR req.body', req.body)
   
-  //var filter = {'email.value': req.session.user.email};
-  var token_data = jwt.decode(req.headers.authorization, config.secret, false, 'HS256')
+  var token_data = jwt.decode(req.headers.auth, config.secret, false, 'HS256')
   console.log('GET CUR token_data', token_data)
   var filter = {'_id': token_data.id};
   var fields = {}
@@ -120,15 +119,18 @@ router.post('/update', (req, res, next)=>{
       // Достаём нужное поле по URL
       let urls = req.body.url.split('.')
       let get_result_field = get_results[0]
+      let field_finded = true
       if(get_results.length > 0)
           for (i in urls) {
-             console.log('urls[i]',urls[i])
-             get_result_field = get_result_field[urls[i]]
+            console.log('urls[i]',urls[i])
+            console.log('=== get_result_field', get_result_field)
+            if(get_result_field != undefined) {
+              get_result_field = get_result_field[urls[i]]
+            }
           }
       console.log('UPDATE CUR get_result_field', get_result_field)
 
       // Если поле найдено, то обновляем его
-//      if(!!get_result_field && get_result_field.length > 1) { // length > 1 т.к. при GET несуществующего объекта возвращается метаобъект с полем ID
       if(!!get_result_field) { // length > 1 т.к. при GET несуществующего объекта возвращается метаобъект с полем ID
         // Если данные на сервере не актуальны, то обновляем их
         if(get_result_field.time < req.body.devicetime){

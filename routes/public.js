@@ -37,7 +37,7 @@ router.post('/projects', (req, res, next)=>{
 
   console.log('new_project req.body', req.body)
 
-  // Собираем данные для регистрации
+  // Собираем данные
   // let data = {
   //   title: {
   //       'value': req.body.title,
