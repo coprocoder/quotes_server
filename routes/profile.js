@@ -21,7 +21,8 @@ router.post('/get', (req, res, next)=>{
   //console.log('GET req.session', req.session)
   console.log('GET CUR req.head.auth', req.headers.auth)
   console.log('GET CUR req.body', req.body)
-  
+
+  //var filter = {'email.value': req.session.user.email};
   var token_data = jwt.decode(req.headers.auth, config.secret, false, 'HS256')
   console.log('GET CUR token_data', token_data)
   var filter = {'_id': token_data.id};
@@ -50,7 +51,7 @@ router.post('/get', (req, res, next)=>{
       if (!!results_found_field){
         if(req.body.time < results_found_field.time || req.body.time == null) {
           for(key in results_found_field)
-            results_found_field[key] = results_found_field[key].value
+            // results_found_field[key] = results_found_field[key].value
             res.send(results_found_field);
         }
         else {
