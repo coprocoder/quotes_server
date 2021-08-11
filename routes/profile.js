@@ -52,6 +52,7 @@ router.post('/get', (req, res, next)=>{
         if(req.body.time < results_found_field.time || req.body.time == null) {
           for(key in results_found_field)
             // results_found_field[key] = results_found_field[key].value
+            console.log('results_found_field')
             res.send(results_found_field);
         }
         else {
