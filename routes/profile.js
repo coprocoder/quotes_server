@@ -83,7 +83,11 @@ router.post('/update', (req, res, next)=>{
     ELSE if < RETURN {code:1, time: null}
   */
   console.log('UPDATE CUR req.body', req.body)
-  var filter = {'email.value':req.session.user.email};
+
+  var token_data = jwt.decode(req.headers.auth, config.secret, false, 'HS256')
+
+  // var filter = {'email.value':req.session.user.email};
+  var filter = {'email.value':token_data.email};
   var fields = {}
 
   var servertime = new Date().getTime(); // Текущее время сервера
