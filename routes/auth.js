@@ -85,7 +85,10 @@ router.post('/signup', (req, res, next)=>{
       -password
       -email
   */
+  var preset_history_vars = ['pulse', 'temp', 'water', 'sugar']
+
   console.log('signup req.body', req.body)
+
   var servertime = new Date().getTime();
   var filter = {"email": req.body.email};
   var fields = {};
@@ -96,14 +99,34 @@ router.post('/signup', (req, res, next)=>{
         // Собираем данные для регистрации
         let data = {
           email: {
-              'value': req.body.email,
-              'time': servertime
+              value: req.body.email,
+              time: servertime
           },
           username: {
-            'value': req.body.username,
-            'time': servertime
+            value: req.body.username,
+            time: servertime
+          },
+          diary: {
+            value: {},
+            time: servertime
+          },
+          history: {
+            value: {},
+            time: servertime
           }
         };
+
+
+        for(i in preset_history_vars) {
+          let key = preset_history_vars[i]
+          let empty_obj = {
+            'value': {},
+            'time': servertime
+          }
+          data['diary']['value'][key] = empty_obj
+          data['history']['value'][key] = empty_obj
+        }
+
         // Записываем данные в обычную БД
         db
           .create(db.users_database,db.users_collection, data)
