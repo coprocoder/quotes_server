@@ -6,6 +6,10 @@ const conversion = require('../db/data_conversion');
 const jwt = require('jwt-simple');
 const config = require('../config/config');
 
+// Конфигурация виджет-пресетов пользователя
+const widget_config = require('../db/templates/config_widget');
+const { wrap, unwrap } = require('../public/javascripts/wrapper')
+
 /* ### === Authorization block === */
 
 router.post('/login', (req, res, next)=>{
@@ -85,7 +89,6 @@ router.post('/signup', (req, res, next)=>{
       -password
       -email
   */
-  var preset_history_vars = ['pulse', 'temp', 'water', 'sugar']
 
   console.log('signup req.body', req.body)
 
@@ -116,15 +119,18 @@ router.post('/signup', (req, res, next)=>{
           }
         };
 
+        console.log('widget_config', widget_config)
+        for(key in widget_config) {
 
-        for(i in preset_history_vars) {
-          let key = preset_history_vars[i]
-          let empty_obj = {
+          // Генерация шаблонных полец истории
+          data['history']['value'][key] = {
             'value': {},
             'time': servertime
-          }
-          data['diary']['value'][key] = empty_obj
-          data['history']['value'][key] = empty_obj
+          }         
+
+          // Генерация шаблонных конфигураций виджетов
+          data['diary']['value'][key] = wrap(widget_config[key], Date.now())
+          
         }
 
         // Записываем данные в обычную БД

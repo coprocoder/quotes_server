@@ -37,6 +37,7 @@ router.post('/get', (req, res, next)=>{
       let results_found_field = results[0]
       let urls
       
+      // Проход по объекту юзера поиска нужного поля
       if(!!req.body.url) {
         fields = { [req.body.url]: 1};
         if(req.body.url.length > 0){
@@ -45,14 +46,13 @@ router.post('/get', (req, res, next)=>{
               results_found_field = results_found_field[urls[i]]
         }
       }
-
       console.log('GET CUR ans', results_found_field)
 
+      // Если поле найдено и данные являются актуальными, то возвращаем
       if (!!results_found_field){
         if(req.body.time < results_found_field.time || req.body.time == null) {
           for(key in results_found_field)
-            // results_found_field[key] = results_found_field[key].value
-            console.log('results_found_field')
+            console.log('field founded: ' + key)
             res.send(results_found_field);
         }
         else {
@@ -88,35 +88,27 @@ router.post('/update', (req, res, next)=>{
 
   // var filter = {'email.value':req.session.user.email};
   var filter = {'email.value':token_data.email};
-  var fields = {}
 
   var servertime = new Date().getTime(); // Текущее время сервера
-  console.log('UPDATE CUR servertime', servertime)
-  var actual_data_time = null
-  var update_fields = null
-  var get_fields = null
+  // console.log('UPDATE CUR servertime', servertime)
+  
+  var actual_data_time = null,
+      update_fields = null
+      get_fields = null
 
   // Преобразовываем входные данные в данные для NoSQL запроса
   if(!!req.body.url) {
     actual_data_time = req.body.devicetime  // Время сервера
                        - servertime         // Время отправки записи
                        + req.body.time      // Время создания записи
-    update_fields = {
-      [req.body.url]: {
-        'value':req.body.value,
-        'time':actual_data_time
-      }
-    };
+
+    update_fields = { [req.body.url.replace('.', '.value.')]: req.body.value };
     get_fields = { [req.body.url]: 1};
   }
   else{
-     res.send({
-          message: "Фильтр данных не задан",
-          code: -1,
-          time: null
-        });
+     res.send({code: -1, time: null, message: "Фильтр данных не задан"});
   }
-  console.log('UPDATE CUR fields', update_fields)
+  console.log('UPDATE CUR update_fields', update_fields)
 
   db
     .get(db.users_database, db.users_collection, filter, get_fields)
@@ -125,17 +117,16 @@ router.post('/update', (req, res, next)=>{
       // Достаём нужное поле по URL
       let urls = req.body.url.split('.')
       let get_result_field = get_results[0]
-      let field_finded = true
       if(get_results.length > 0)
+          //console.log('urls', urls)
           for (i in urls) {
-            console.log('urls[i]',urls[i])
-            console.log('=== get_result_field', get_result_field)
+            //console.log('get_result_field', get_result_field)
             if(get_result_field != undefined) {
               get_result_field = get_result_field[urls[i]]
             }
           }
       console.log('UPDATE CUR get_result_field', get_result_field)
-
+    
       // Если поле найдено, то обновляем его
       if(!!get_result_field) { // length > 1 т.к. при GET несуществующего объекта возвращается метаобъект с полем ID
         // Если данные на сервере не актуальны, то обновляем их
@@ -158,9 +149,7 @@ router.post('/update', (req, res, next)=>{
                 next(err);
               }
             })
-            .catch((err)=>{
-              next(err);
-            })
+            .catch((err)=>{ next(err); })
         }
         else {
           res.send({
