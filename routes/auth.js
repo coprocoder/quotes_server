@@ -19,21 +19,23 @@ router.post('/login', (req, res, next)=>{
         -password
   */
   console.log('login req.body', req.body)
-  var filter = {["email."+val_key]: req.body.email};
+  var filter = {["email"]: req.body.email};
   var fields = {};
   
   // Стучимся в публичную БД
   db
     .get(db.users_database, db.users_collection, filter, fields)
     .then((user_results)=>{
+      console.log('user_results[0]', user_results[0])
       if(user_results.length > 0) {
-        var filter = {["user_id." + val_key]: user_results[0]._id};
+        var filter = {["user_id"]: user_results[0]._id};
 
         // Стучимся в приватную БД
         db
           .get(db.secure_database, db.secure_collection, filter, fields)
           .then((secure_results)=>{
-            if (conversion.isValidPassword(req.body.password, unwrap(secure_results[0]).password)) {
+            console.log('secure_results[0]', secure_results[0])
+            if (conversion.isValidPassword(req.body.password, secure_results[0].password)) {
 
               let user = user_results[0]
               let unwrapped_user = user_results[0] 

@@ -5,6 +5,8 @@ const db = require('../db/db');
 const jwt = require('jwt-simple');
 const config = require('../config/config');
 
+const { val_key, time_key} = require('../public/javascripts/wrapper')
+
 /* === Select from current logged user === */
 
 // Get existed user
@@ -60,12 +62,12 @@ router.post('/get', (req, res, next)=>{
         }
         else {
             res.send({
-                'value':null,
-                'time':null
+                [val_key]:null,
+                [time_key]:null
             })
         }
       } else {
-        res.send({value:null});
+        res.send({[val_key]:null});
       }
     })
     .catch((err)=>{
@@ -90,8 +92,7 @@ router.post('/update', (req, res, next)=>{
 
   var token_data = jwt.decode(req.headers.auth, config.secret, false, 'HS256')
 
-  // var filter = {'email.value':req.session.user.email};
-  var filter = {'email.value':token_data.email};
+  var filter = {'email':token_data.email};
   var servertime = new Date().getTime(); // Текущее время сервера
   
   var actual_data_time = null,
@@ -104,7 +105,7 @@ router.post('/update', (req, res, next)=>{
                        - servertime         // Время отправки записи
                        + req.body.time      // Время создания записи
 
-    update_fields = { [req.body.url.replace('.', '.value.')]: req.body.value };
+    update_fields = { [req.body.url.replace('.', '.'+val_key+'.')]: req.body.value };
     get_fields = { [req.body.url]: 1};
   }
   else{
