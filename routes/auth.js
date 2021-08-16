@@ -8,7 +8,7 @@ const config = require('../config/config');
 
 // Конфигурация виджет-пресетов пользователя
 const widget_config = require('../db/templates/config_widget');
-const { wrap, unwrap } = require('../public/javascripts/wrapper')
+const { val_key, time_key, wrap, unwrap } = require('../public/javascripts/wrapper')
 
 /* ### === Authorization block === */
 
@@ -19,7 +19,7 @@ router.post('/login', (req, res, next)=>{
         -password
   */
   console.log('login req.body', req.body)
-  var filter = {"email.value": req.body.email};
+  var filter = {["email."+val_key]: req.body.email};
   var fields = {};
   
   // Стучимся в публичную БД
@@ -27,24 +27,27 @@ router.post('/login', (req, res, next)=>{
     .get(db.users_database, db.users_collection, filter, fields)
     .then((user_results)=>{
       if(user_results.length > 0) {
-        var filter = {"user_id.value": user_results[0]._id};
+        var filter = {["user_id." + val_key]: user_results[0]._id};
 
         // Стучимся в приватную БД
         db
           .get(db.secure_database, db.secure_collection, filter, fields)
           .then((secure_results)=>{
-            if (conversion.isValidPassword(req.body.password, secure_results[0].password.value)) {
+            if (conversion.isValidPassword(req.body.password, unwrap(secure_results[0]).password)) {
+
+              let user = user_results[0]
+              let unwrapped_user = user_results[0] 
 
               // Данные внутри токена
               let payload ={
-                id: user_results[0]._id,
-                username: user_results[0].username.value,
-                email:user_results[0].email.value,
-                role: secure_results[0].role.value
+                id: user._id,
+                username: unwrapped_user.username,
+                email:unwrapped_user.email,
+                role: unwrapped_user.role
               }
               let token = jwt.encode(payload, config.secret);
               
-              req.session.user = {id: user_results[0]._id, email: user_results[0].email.value}
+              req.session.user = {id: user._id, email: unwrapped_user.email}
               req.session.isLogged = true;
               req.session.save()  // Сохранение сессии в БД mongoStore
               console.log('login req.session', req.session)
@@ -101,68 +104,41 @@ router.post('/signup', (req, res, next)=>{
       if (results.length == 0){
         // Собираем данные для регистрации
         let data = {
-          email: {
-              value: req.body.email,
-              time: servertime
-          },
-          username: {
-            value: req.body.username,
-            time: servertime
-          },
-          diary: {
-            value: {},
-            time: servertime
-          },
-          history: {
-            value: {},
-            time: servertime
-          }
+          email: req.body.email,
+          username: req.body.username,
+          diary: {},
+          history: {}
         };
 
         console.log('widget_config', widget_config)
-        for(key in widget_config) {
+        // for(key in widget_config) {
 
-          // Генерация шаблонных полец истории
-          data['history']['value'][key] = {
-            'value': {},
-            'time': servertime
-          }         
-
-          // Генерация шаблонных конфигураций виджетов
-          data['diary']['value'][key] = wrap(widget_config[key], Date.now())
-          
-        }
+        // Генерация шаблонных полей истории
+        data['diary'] = wrap(widget_config, servertime)
+        data['history'] = wrap(Object.assign({}, ...Object.keys(widget_config).map(x => ({[x]: {}}))), servertime)
 
         // Записываем данные в обычную БД
         db
           .create(db.users_database,db.users_collection, data)
           .then((results)=>{
             var new_user = results.ops[0]
+            console.log('new_user', new_user)
             
             let payload ={
               id: new_user._id,
-              email:new_user.email.value,
+              email: new_user.email,
               role: 0
             }
             let token = jwt.encode(payload, config.secret);
-            req.session.user = {id: new_user._id, email: new_user.email.value}
+            req.session.user = {id: new_user._id, email: new_user.email}
             req.session.save()  // Сохранение сессии в БД mongoStore
             console.log('sess', req.session)
 
             // Собираем секретные данные для регистрации (пароль)
             let secure_data = {
-              user_id: {
-                  'value': new_user._id,
-                  'time': servertime
-              },
-              password: {
-                  'value': conversion.createHash(req.body.password),
-                  'time': servertime
-              },
-              role: {
-                  'value': 1,
-                  'time': servertime
-              }
+              user_id: new_user._id,
+              password: conversion.createHash(req.body.password),
+              role: 1,
             };
             // Записываем пароль в секретную БД
             db

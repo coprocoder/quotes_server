@@ -37,22 +37,6 @@ router.post('/projects', (req, res, next)=>{
 
   console.log('new_project req.body', req.body)
 
-  // Собираем данные
-  // let data = {
-  //   title: {
-  //       'value': req.body.title,
-  //       'time': servertime
-  //   },
-  //   note: {
-  //     'value': req.body.note,
-  //     'time': servertime
-  //   },
-  //   text: {
-  //     'value': req.body.text,
-  //     'time': servertime
-  //   }
-  // };
-
   let data = {
     title: req.body.title,
     note: req.body.note,

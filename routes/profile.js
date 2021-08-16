@@ -42,8 +42,11 @@ router.post('/get', (req, res, next)=>{
         fields = { [req.body.url]: 1};
         if(req.body.url.length > 0){
           urls  = req.body.url.split('.')
-          for (i in urls)
+          console.log('GET CUR results_found_field', results_found_field)
+          console.log('GET CUR urls', urls)
+          for (i in urls){
               results_found_field = results_found_field[urls[i]]
+          }
         }
       }
       console.log('GET CUR ans', results_found_field)
@@ -82,15 +85,14 @@ router.post('/update', (req, res, next)=>{
     IF time > db_time RETURN {code:0, time: time + (server_time - devicetime)
     ELSE if < RETURN {code:1, time: null}
   */
+ 
   console.log('UPDATE CUR req.body', req.body)
 
   var token_data = jwt.decode(req.headers.auth, config.secret, false, 'HS256')
 
   // var filter = {'email.value':req.session.user.email};
   var filter = {'email.value':token_data.email};
-
   var servertime = new Date().getTime(); // Текущее время сервера
-  // console.log('UPDATE CUR servertime', servertime)
   
   var actual_data_time = null,
       update_fields = null
@@ -114,13 +116,12 @@ router.post('/update', (req, res, next)=>{
     .get(db.users_database, db.users_collection, filter, get_fields)
     .then((get_results)=>{
       console.log('UPDATE CUR get_results', get_results)
+      
       // Достаём нужное поле по URL
       let urls = req.body.url.split('.')
       let get_result_field = get_results[0]
       if(get_results.length > 0)
-          //console.log('urls', urls)
           for (i in urls) {
-            //console.log('get_result_field', get_result_field)
             if(get_result_field != undefined) {
               get_result_field = get_result_field[urls[i]]
             }

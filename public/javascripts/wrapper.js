@@ -1,3 +1,6 @@
+const val_key = '_V'
+const time_key = '_T'
+
 const wrap = (obj, time) => {
     console.log('wrap args', obj, time)
     obj = JSON.parse(JSON.stringify(obj))
@@ -6,14 +9,14 @@ const wrap = (obj, time) => {
             obj[k] = wrap(obj[k], time)
         })
     return {
-        value: obj,
-        time
+        [val_key]: obj,
+        [time_key]: time
     }
 }
 
 const unwrap = (obj) => {
     console.log('unwrap args', obj)
-    obj = JSON.parse(JSON.stringify(obj.value))
+    obj = JSON.parse(JSON.stringify(obj[val_key]))
     if (Object.prototype.isPrototypeOf(obj) && !Array.prototype.isPrototypeOf(obj))
         Object.keys(obj).forEach(k => {
             obj[k] = unwrap(obj[k])
