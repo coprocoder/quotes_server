@@ -106,14 +106,11 @@ router.post('/signup', (req, res, next)=>{
       if (results.length == 0){
         // Собираем данные для регистрации
         let data = {
-          email: req.body.email,
-          username: req.body.username,
+          email: wrap(req.body.email, servertime),
+          username: wrap(req.body.username, servertime),
           diary: {},
           history: {}
-        };
-
-        console.log('widget_config', widget_config)
-        // for(key in widget_config) {
+        }; 
 
         // Генерация шаблонных полей истории
         data['diary'] = wrap(widget_config, servertime)

@@ -24,4 +24,4 @@ const unwrap = (obj) => {
     return obj
 }
 
-module.exports = { wrap, unwrap }
+module.exports = { wrap, unwrap, val_key, time_key }
