@@ -19,7 +19,7 @@ router.post('/login', (req, res, next)=>{
         -password
   */
   console.log('login req.body', req.body)
-  var filter = {["email"]: req.body.email};
+  var filter = {["email."+val_key]: req.body.email};
   var fields = {};
   
   // Стучимся в публичную БД
@@ -98,7 +98,7 @@ router.post('/signup', (req, res, next)=>{
   console.log('signup req.body', req.body)
 
   var servertime = new Date().getTime();
-  var filter = {"email": req.body.email};
+  var filter = {["email."+val_key]: req.body.email};
   var fields = {};
   db
     .get(db.users_database, db.users_collection, filter, fields)
@@ -106,13 +106,15 @@ router.post('/signup', (req, res, next)=>{
       if (results.length == 0){
         // Собираем данные для регистрации
         let data = {
-          email: wrap(req.body.email, servertime),
-          username: wrap(req.body.username, servertime),
+          email: req.body.email,
+          username: req.body.username,
           diary: {},
           history: {}
-        }; 
+        };
 
         // Генерация шаблонных полей истории
+        data['email'] = wrap(req.body.email, servertime)
+        data['username'] = wrap(req.body.username, servertime)
         data['diary'] = wrap(widget_config, servertime)
         data['history'] = wrap(Object.assign({}, ...Object.keys(widget_config).map(x => ({[x]: {}}))), servertime)
 
