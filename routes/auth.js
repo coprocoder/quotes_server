@@ -116,7 +116,7 @@ router.post('/signup', (req, res, next)=>{
         data['email'] = wrap(req.body.email, servertime)
         data['username'] = wrap(req.body.username, servertime)
         data['diary'] = wrap(widget_config, servertime)
-        data['history'] = wrap(Object.assign({}, ...Object.keys(widget_config).map(x => ({[x]: {}}))), servertime)
+        data['history'] = wrap(Object.assign({}, ...Object.keys(widget_config).map(x => ({[x]: {'name': x}}))), servertime)
 
         // Записываем данные в обычную БД
         db
