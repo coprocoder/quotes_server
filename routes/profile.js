@@ -47,7 +47,8 @@ router.post('/get', (req, res, next)=>{
           console.log('GET CUR results_found_field', results_found_field)
           console.log('GET CUR urls', urls)
           for (i in urls){
-              results_found_field = results_found_field[urls[i]]
+            if(results_found_field[urls[i]] != undefined)
+              results_found_field = results_found_field[urls[i]] 
           }
         }
       }

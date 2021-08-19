@@ -8,6 +8,8 @@ const config = require('../config/config');
 
 // Конфигурация виджет-пресетов пользователя
 const widget_config = require('../db/templates/config_widget');
+const variables_config = require('../db/templates/config_variables');
+
 const { val_key, time_key, wrap, unwrap } = require('../public/javascripts/wrapper')
 
 /* ### === Authorization block === */
@@ -109,14 +111,16 @@ router.post('/signup', (req, res, next)=>{
           email: req.body.email,
           username: req.body.username,
           diary: {},
-          history: {}
+          history: {},
+          variables: {}
         };
 
         // Генерация шаблонных полей истории
         data['email'] = wrap(req.body.email, servertime)
         data['username'] = wrap(req.body.username, servertime)
         data['diary'] = wrap(widget_config, servertime)
-        data['history'] = wrap(Object.assign({}, ...Object.keys(widget_config).map(x => ({[x]: {'name': x}}))), servertime)
+        data['history'] = wrap(Object.assign({}, ...Object.keys(widget_config).map(x => ({[x]: {} }))), servertime)
+        data['variables'] = wrap(Object.assign({}, ...Object.keys(widget_config).map(x => ({[x]: {locale: variables_config[x] }}))), servertime)
 
         // Записываем данные в обычную БД
         db
