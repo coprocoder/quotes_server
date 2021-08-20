@@ -15,13 +15,13 @@ module.exports = widget_config = {
         "wide": true            // хз
     */
     temperature: {
-        "backgroundColor": 1,   
+        "backgroundColor": 5,   
         "chartType": 0,         
         "chartValues": [{
             "variables": [{
                 "name": "temperature"
             }],
-            "color": 4
+            "color": 7
         }],
         "title": "Температура",
         "outputFormat": "{0}",
@@ -29,13 +29,13 @@ module.exports = widget_config = {
         "wide": true
     },
     pressure: {
-        "backgroundColor": 2,
+        "backgroundColor": 8,
         "chartType": 0,
         "chartValues": [{
             "variables": [{
                 "name": "pressure"
             }],
-            "color": 3
+            "color": 4
         }],
         "title": "Давление",
         "outputFormat": "{0}/{1}",
@@ -43,7 +43,7 @@ module.exports = widget_config = {
         "wide": true
     },
     pulse: {
-        "backgroundColor": 3,
+        "backgroundColor": 4,
         "chartType": 0,
         "chartValues": [{
             "variables": [{
@@ -57,13 +57,13 @@ module.exports = widget_config = {
         "wide": true
     },
     sugar: {
-        "backgroundColor": 4,
+        "backgroundColor": 0,
         "chartType": 0,
         "chartValues": [{
             "variables": [{
                 "name": "sugar"
             }],
-            "color": 1
+            "color": 6
         }],
         "title": "Уровень глюкозы",
         "outputFormat": "{0}",
