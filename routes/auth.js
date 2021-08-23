@@ -40,18 +40,18 @@ router.post('/login', (req, res, next)=>{
             if (conversion.isValidPassword(req.body.password, secure_results[0].password)) {
 
               let user = user_results[0]
-              let unwrapped_user = user_results[0] 
+              console.log('user', user)
 
               // Данные внутри токена
               let payload ={
                 id: user._id,
-                username: unwrapped_user.username,
-                email:unwrapped_user.email,
-                role: unwrapped_user.role
+                username: unwrap(user_results[0].username),
+                email:unwrap(user_results[0].email),
+                role: secure_results[0].role
               }
               let token = jwt.encode(payload, config.secret);
               
-              req.session.user = {id: user._id, email: unwrapped_user.email}
+              req.session.user = {id: user._id, email: unwrap(user_results[0].email)}
               req.session.isLogged = true;
               req.session.save()  // Сохранение сессии в БД mongoStore
               console.log('login req.session', req.session)
