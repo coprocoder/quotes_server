@@ -107,7 +107,7 @@ router.post('/update', (req, res, next)=>{
                        + req.body.time      // Время создания записи
 
     console.log('val_key', val_key)
-    update_fields = { [req.body.url.replace('.', '.'+val_key+'.')]: req.body.value };
+    update_fields = { [req.body.url]: req.body.value };
     get_fields = { [req.body.url]: 1};
   }
   else{

@@ -64,7 +64,7 @@ module.exports.update = function(cur_db, cur_collection, filter, fields) {
         client
           .db(cur_db)
           .collection(cur_collection)
-          .update(
+          .updateOne(
             filter,
             [
               { $unset: Object.keys(fields) },

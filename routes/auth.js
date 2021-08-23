@@ -45,8 +45,8 @@ router.post('/login', (req, res, next)=>{
               // Данные внутри токена
               let payload ={
                 id: user._id,
-                username: unwrap(user_results[0].username),
-                email:unwrap(user_results[0].email),
+                username: user_results[0].username,
+                email: user_results[0].email,
                 role: secure_results[0].role
               }
               let token = jwt.encode(payload, config.secret);
