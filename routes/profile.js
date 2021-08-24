@@ -134,7 +134,7 @@ router.post('/update', (req, res, next)=>{
       // Если поле найдено, то обновляем его
       if(!!get_result_field) { // length > 1 т.к. при GET несуществующего объекта возвращается метаобъект с полем ID
         // Если данные на сервере не актуальны, то обновляем их
-        if(get_result_field.time < req.body.devicetime){
+        if(get_result_field._T < req.body.time){
           db
             .update(db.users_database, db.users_collection, filter, update_fields)
             .then((results)=>{
