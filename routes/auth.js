@@ -132,6 +132,7 @@ router.post('/signup', (req, res, next)=>{
             let payload ={
               id: new_user._id,
               email: new_user.email,
+              username: new_user.username,
               role: 0
             }
             let token = jwt.encode(payload, config.secret);
