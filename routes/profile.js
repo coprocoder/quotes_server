@@ -187,6 +187,23 @@ router.post('/update', (req, res, next)=>{
             next(err);
           })
        }
+      
+      // Обновляем время рядом с каждым _V (val_key)
+      let time_url = urls[0]
+      for (let i=1; i < urls.length; i++) {
+        // console.log('time_url', time_url, urls[i])
+        if(urls[i] != val_key) {
+          time_url = time_url + '.' + urls[i]
+        }
+        else {
+          let cur_url = time_url + '.' + time_key
+          let update_time_fields = { [cur_url]: req.body.time };
+          // console.log('update_time_fields', update_time_fields)
+          db
+          .update(db.users_database, db.users_collection, filter, update_time_fields)
+        }
+      }
+
     })
     .catch((err)=>{
       next(err);
