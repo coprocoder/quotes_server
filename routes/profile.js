@@ -49,6 +49,11 @@ router.post('/get', (req, res, next)=>{
           for (i in urls){
             if(results_found_field[urls[i]] != undefined)
               results_found_field = results_found_field[urls[i]] 
+            else
+              results_found_field = {
+                [val_key]:null,
+                [time_key]:null
+              }
           }
         }
       }
@@ -56,7 +61,8 @@ router.post('/get', (req, res, next)=>{
 
       // Если поле найдено и данные являются актуальными, то возвращаем
       if (!!results_found_field){
-        if(req.body.time < results_found_field.time || req.body.time == null) {
+        if(req.body.time < results_found_field[time_key] || req.body.time == null) {
+          console.log('=== results_found_field ===', req.body.time, results_found_field[time_key])
           for(key in results_found_field)
             console.log('field founded: ' + key)
             res.send(results_found_field);
@@ -193,7 +199,7 @@ router.post('/update', (req, res, next)=>{
       for (let i=1; i < urls.length; i++) {
         // console.log('time_url', time_url, urls[i])
         if(urls[i] != val_key) {
-          time_url = time_url + '.' + urls[i]
+          time_url = time_url + '.' + val_key + '.' + urls[i]
         }
         else {
           let cur_url = time_url + '.' + time_key
