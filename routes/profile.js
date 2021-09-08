@@ -5,7 +5,8 @@ const db = require('../db/db');
 const jwt = require('jwt-simple');
 const config = require('../config/config');
 
-const { val_key, time_key} = require('../public/javascripts/wrapper')
+
+const { val_key, time_key, unwrap} = require('../public/javascripts/wrapper')
 
 /* === Select from current logged user === */
 
@@ -34,6 +35,8 @@ router.post('/get', (req, res, next)=>{
     .get(db.users_database, db.users_collection, filter, fields)
     .then((results)=>{
       console.log('GET CUR results', results)
+      console.log('GET CUR results', JSON.stringify(unwrap(results[0].diary)))
+      console.log('GET CUR results', JSON.stringify(unwrap(results[0].variables)))
 
       // Достаём по url нужное вложенное поле из результата
       let results_found_field = results[0]

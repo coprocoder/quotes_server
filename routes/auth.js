@@ -7,8 +7,7 @@ const jwt = require('jwt-simple');
 const config = require('../config/config');
 
 // Конфигурация виджет-пресетов пользователя
-const widget_config = require('../db/templates/config_widget');
-const variables_config = require('../db/templates/config_variables');
+const user_preset_config = require('../db/templates/user_preset_config');
 
 const { val_key, time_key, wrap, unwrap } = require('../public/javascripts/wrapper')
 
@@ -118,9 +117,9 @@ router.post('/signup', (req, res, next)=>{
         // Генерация шаблонных полей истории
         data['email'] = wrap(req.body.email, servertime)
         data['username'] = wrap(req.body.username, servertime)
-        data['diary'] = wrap(widget_config, servertime)
-        data['history'] = wrap(Object.assign({}, ...Object.keys(widget_config).map(x => ({[x]: {} }))), servertime)
-        data['variables'] = wrap(Object.assign({}, ...Object.keys(widget_config).map(x => ({[x]: {locale: variables_config[x] }}))), servertime)
+        data['diary'] = wrap(user_preset_config.diary, servertime)
+        data['history'] = wrap(Object.assign({}, ...Object.keys(user_preset_config.diary).map(x => ({[x]: {} }))), servertime)
+        data['variables'] = wrap(Object.assign({}, ...Object.keys(user_preset_config.variables).map(x => ({[x]: user_preset_config.variables[x] }))), servertime)
 
         // Записываем данные в обычную БД
         db
