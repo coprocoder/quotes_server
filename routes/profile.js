@@ -224,20 +224,20 @@ router.post('/update', (req, res, next)=>{
 
 /* === FILES === */
 
-var storage = multer.diskStorage({
+var storage_img = multer.diskStorage({
   destination: function (req, file, cb) {
-  cb(null, 'public')
-},
-filename: function (req, file, cb) {
-  cb(null, Date.now() + '-' +file.originalname )
-}
+    cb(null, 'public/images')
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + '-' +file.originalname )
+  }
 })
 // var upload = multer({ storage: storage }).single('file')
-var upload = multer({ storage: storage }).array('file')
+var uploadImg = multer({ storage: storage_img }).array('file')
 
 router.post('/upload_file', (req, res, next)=>{
 
-  upload(req, res, function (err) {
+  uploadImg(req, res, function (err) {
     if (err instanceof multer.MulterError) {
         return res.status(500).json(err)
     } else if (err) {
