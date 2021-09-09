@@ -45,6 +45,11 @@ module.exports = user_preset_config = {
                     "variables": [{
                             "name": "1630996108516",
                             "constant": null
+                        },
+                        {
+                            "name": null,
+                            "pre": "*",
+                            "constant": -1
                         }
                     ],
                     "color": 0,

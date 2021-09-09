@@ -111,6 +111,40 @@ module.exports.remove = function(cur_db, cur_collection, filter, fields) {
   })
 }
 
+// Update field by path
+module.exports.updloadFile = function(cur_db, cur_collection, filter, fields) {
+  console.log('db updloadFile FILTER', filter)
+  console.log('db updloadFile FIELDS', fields)
+
+  return new Promise((resolve, reject) => {
+    MongoClient
+      .connect(url, function(err, client) {
+        if (err) {
+          reject(err);
+        }
+        client
+          .db(cur_db)
+          .collection(cur_collection)
+          .updateOne(
+            filter,
+            [
+              { $unset: Object.keys(fields) },
+              { $set: fields },
+            ],
+            { multi: true },
+            function(err, results){
+              if (err) {
+                reject(err);
+              }
+              client.close();
+              resolve(results);
+            }
+          )
+      });
+  })
+}
+
+
 
 /* === NEW ITEMS BLOCK === */
 

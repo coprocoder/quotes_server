@@ -25,8 +25,11 @@ app.set('view engine', 'html');
 app.use(logger('dev'));
 
 //### req.body parse
-app.use(express.urlencoded({ extended: false })); // этим мы делаем доступным объект req.body (ну а в нем поля формы)
-app.use(express.json()); // Для просмотра request.body в POST
+app.use(express.urlencoded({ limit: '10mb', extended: true })); // этим мы делаем доступным объект req.body (ну а в нем поля формы)
+app.use(express.json({limit: '10mb', extended: true})); // Для просмотра request.body в POST
+
+// app.use(bodyParser.urlencoded({limit: '10mb', extended: true}))
+// app.use(bodyParser.json({limit: '10mb', extended: true}))
 
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));

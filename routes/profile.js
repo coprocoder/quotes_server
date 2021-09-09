@@ -219,4 +219,52 @@ router.post('/update', (req, res, next)=>{
     })
 })
 
+// Update field by existed user
+router.post('/upload_file', (req, res, next)=>{
+ 
+  console.log(req);
+  let imageFile = req.files.file;
+ 
+  imageFile.mv(`${__dirname}/public/${req.body.filename}.jpg`, function(err) {
+    if (err) {
+      return res.status(500).send(err);
+    }
+ 
+    res.json({file: `public/${req.body.filename}.jpg`});
+  });
+  
+  // console.log('upload_file CUR req.body', req.body)
+  // console.log('upload_file CUR req.files', req.files)
+
+  // var token_data = jwt.decode(req.headers.auth, config.secret, false, 'HS256')
+  // var filter = {'email':token_data.email};
+  // var update_fields = null
+
+  // // Преобразовываем входные данные в данные для NoSQL запроса
+  // if(!!req.body.url) {
+  //   update_fields = { [req.body.url]: req.body.value };
+  // }
+  // else{
+  //    res.send({code: -1, time: null, message: "Фильтр данных не задан"});
+  // }
+  // // console.log('upload_file CUR update_fields', update_fields)
+
+  // db
+  // .updloadFile(db.users_database, db.users_collection, filter, update_fields)
+  // .then((results)=>{
+  //   if (!!results){
+  //     res.send({
+  //       message: "Данные обновлены",
+  //       code: 0,
+  //       time: Date.now()
+  //     });
+  //   } else {
+  //     const err = new Error('Данные не обновлены!');
+  //     err.status = 400;
+  //     next(err);
+  //   }
+  // })
+  // .catch((err)=>{ next(err); })
+})
+
 module.exports = router;
