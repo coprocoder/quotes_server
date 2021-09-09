@@ -1,4 +1,5 @@
 const express = require('express');
+var multer = require('multer')
 const router = express.Router();
 const db = require('../db/db');
 
@@ -219,19 +220,32 @@ router.post('/update', (req, res, next)=>{
     })
 })
 
-// Update field by existed user
+
+
+/* === FILES === */
+
+var storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+  cb(null, 'public')
+},
+filename: function (req, file, cb) {
+  cb(null, Date.now() + '-' +file.originalname )
+}
+})
+// var upload = multer({ storage: storage }).single('file')
+var upload = multer({ storage: storage }).array('file')
+
 router.post('/upload_file', (req, res, next)=>{
- 
-  console.log(req);
-  let imageFile = req.files.file;
- 
-  imageFile.mv(`${__dirname}/public/${req.body.filename}.jpg`, function(err) {
-    if (err) {
-      return res.status(500).send(err);
+
+  upload(req, res, function (err) {
+    if (err instanceof multer.MulterError) {
+        return res.status(500).json(err)
+    } else if (err) {
+        return res.status(500).json(err)
     }
- 
-    res.json({file: `public/${req.body.filename}.jpg`});
-  });
+    return res.status(200).send(req.file)
+  })
+
   
   // console.log('upload_file CUR req.body', req.body)
   // console.log('upload_file CUR req.files', req.files)
