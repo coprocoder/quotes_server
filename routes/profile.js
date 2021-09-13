@@ -236,8 +236,9 @@ var storage_img = multer.diskStorage({
 var uploadImg = multer({ storage: storage_img }).array('file')
 
 router.post('/upload_file', (req, res, next)=>{
-
   uploadImg(req, res, function (err) {
+    console.log("upload_file", req)
+    console.log("files", req.files)
     if (err instanceof multer.MulterError) {
         return res.status(500).json(err)
     } else if (err) {
