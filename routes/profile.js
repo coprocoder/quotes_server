@@ -1,5 +1,13 @@
 const express = require('express');
+
+// For up/download files
 var multer = require('multer')
+const fs = require('fs')
+const path = require('path')
+const sharp = require('sharp')
+const { promisify } = require('util')
+const sizeOf = promisify(require('image-size'))
+
 const router = express.Router();
 const db = require('../db/db');
 
@@ -9,7 +17,7 @@ const config = require('../config/config');
 
 const { val_key, time_key, unwrap} = require('../public/javascripts/wrapper')
 
-/* === Select from current logged user === */
+/* === SELECT INFO  === */
 
 // Get existed user
 router.post('/get', (req, res, next)=>{
@@ -226,60 +234,154 @@ router.post('/update', (req, res, next)=>{
 
 var storage_img = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'public/images')
+    cb(null, 'public/images/full')
   },
   filename: function (req, file, cb) {
     cb(null, Date.now() + '-' +file.originalname )
   }
 })
-// var upload = multer({ storage: storage }).single('file')
-var uploadImg = multer({ storage: storage_img }).array('file')
+var storage_files = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, 'public/files')
+  },
+  filename: function (req, file, cb) {
+    cb(null, Date.now() + '-' +file.originalname )
+  }
+})
+var uploadImg = multer({ storage: storage_img })
+var uploadFiles = multer({ storage: storage_files })
 
-router.post('/upload_file', (req, res, next)=>{
-  uploadImg(req, res, function (err) {
-    console.log("upload_file", req)
-    console.log("files", req.files)
-    if (err instanceof multer.MulterError) {
-        return res.status(500).json(err)
-    } else if (err) {
-        return res.status(500).json(err)
+router.post('/upload_img', uploadImg.array('file'), async (req, res) => {
+  /* 
+    res.files : [
+      { file_info1},
+      { file_info2},
+      ...
+    ]
+
+    ex: {
+      destination: "public/images/full",
+      encoding: "7bit",
+      fieldname: "file",
+      filename: "1631521695124-cake.jpg",
+      mimetype: "image/jpeg",
+      originalname: "cake.jpg",
+      path: "public\\images\\full\\1631521695124-cake.jpg",
+      resize: "public\\images\\resized\\1631521695124-cake.jpg",
+      size: 175981
     }
-    return res.status(200).send(req.file)
+  */
+
+  console.log('multer files', req.files)
+
+  for(let i in req.files) {
+    let file = req.files[i]
+    let resize_abs_path = path.resolve(path.join(file.destination,'../'),  'resized', file.filename)
+    let resize_rel_path = path.join(file.destination,'../resized', file.filename);
+
+    // Добавляем в ответ путь к resize img
+    file['resized'] = resize_rel_path
+    
+    // let new_h, new_w
+    // sizeOf(resize_abs_path)
+    //   .then(dimensions => { 
+    //       console.log('dimensions', dimensions);
+
+    //       let max_size = 200 // height or width
+    //       if(dimensions.width > dimensions.height) {
+    //         new_w = max_size
+    //         new_h = dimensions.height * (max_size / dimensions.width )
+    //       }
+    //       else {
+    //         new_w = mdimensions.width * (max_size / dimensions.height )
+    //         new_h = max_size 
+    //       }
+    //    })
+    //   .catch(err => console.error(err))
+
+    await sharp(file.path)
+      .resize(200,200)
+      .jpeg({ quality: 90 })
+      .toFile(
+        resize_abs_path
+      )
+  }
+  return res.status(200).send(req.files)
+})
+
+router.post('/download_img', (req, res, next)=>{
+  /*
+    body : {
+      "mimetype": "image/png",
+      "path":"public\\images\\full\\1631517937969-cake2.png",
+      "resize":"public\\images\\resized\\1631517937969-cake2.png"
+    }
+  */
+
+  // let fileName = req.body.filename    // <name>
+
+  // rel path
+  let path_full = req.body.path    // public/images/<name>
+  let path_resized = req.body.resized    // public/images/<name>
+
+  // abs path
+  let filePath_full = path.join(__dirname, '../' + path_full);
+  let filePath_resized = path.join(__dirname, '../' + path_resized);
+
+  // buffered images
+  var bitmap_full = fs.readFileSync(filePath_full);
+  var bitmap_resized = fs.readFileSync(filePath_resized);
+
+  // send converted images (base64) 
+  res.send({
+    full: 'data:' + req.body.mimetype + ';base64,' + Buffer(bitmap_full).toString('base64'),
+    resized: 'data:' + req.body.mimetype + ';base64,' + Buffer(bitmap_resized).toString('base64')
   })
 
-  
-  // console.log('upload_file CUR req.body', req.body)
-  // console.log('upload_file CUR req.files', req.files)
+  // res.zip([
+  //   { path: filePath_full, name: fileName },
+  //   { path: filePath_resize, name: fileName}
+  // ]);
 
-  // var token_data = jwt.decode(req.headers.auth, config.secret, false, 'HS256')
-  // var filter = {'email':token_data.email};
-  // var update_fields = null
-
-  // // Преобразовываем входные данные в данные для NoSQL запроса
-  // if(!!req.body.url) {
-  //   update_fields = { [req.body.url]: req.body.value };
-  // }
-  // else{
-  //    res.send({code: -1, time: null, message: "Фильтр данных не задан"});
-  // }
-  // // console.log('upload_file CUR update_fields', update_fields)
-
-  // db
-  // .updloadFile(db.users_database, db.users_collection, filter, update_fields)
-  // .then((results)=>{
-  //   if (!!results){
-  //     res.send({
-  //       message: "Данные обновлены",
-  //       code: 0,
-  //       time: Date.now()
-  //     });
+  // let options = {}
+  // res.sendFile(filePath_full, options, function (err) {
+  //   if (err) {
+  //       next(err);
   //   } else {
-  //     const err = new Error('Данные не обновлены!');
-  //     err.status = 400;
-  //     next(err);
+  //       console.log('Sent full:', fileName);
   //   }
   // })
-  // .catch((err)=>{ next(err); })
+
+  // res.download(filePath_full, fileName, (err) => {
+  //   if (err) {
+  //     res.status(500).send({
+  //       message: "Could not download the file. " + err,
+  //     });
+  //   }
+  // });
+})
+ 
+router.post('/upload_files', uploadFiles.array('file'), async (req, res) => {
+
+  console.log('multer files', req.files)
+  
+  return res.status(200).send(req.files)
+})
+
+router.post('/download_files', (req, res, next)=>{
+  console.log('download_files req.body', req.body)
+
+  
+  // let fileName = req.body.filename    // <name>
+
+  // rel path
+  let rel_path = req.body.path    // public/images/<name>
+
+  // abs path
+  let filePath = path.join(__dirname, '../' + rel_path);
+  console.log('filePath', filePath)
+
+  res.sendFile(filePath)
 })
 
 module.exports = router;
