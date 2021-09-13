@@ -270,7 +270,7 @@ router.post('/upload_img', multer({ storage: storage_img }).array('file'), async
     let resize_rel_path = path.join(file.destination,'../resized', file.filename);
 
     // Добавляем в ответ путь к resize img
-    file['resize'] = resize_rel_path
+    file['resized'] = resize_rel_path
     
     await sharp(file.path)
       .resize(200, 200)
@@ -296,15 +296,15 @@ router.post('/download_img', (req, res, next)=>{
 
   // rel path
   let path_full = req.body.path    // public/images/<name>
-  let path_resize = req.body.resize    // public/images/<name>
+  let path_resized = req.body.resized    // public/images/<name>
 
   // abs path
   let filePath_full = path.join(__dirname, '../' + path_full);
-  let filePath_resize = path.join(__dirname, '../' + path_resize);
+  let filePath_resized = path.join(__dirname, '../' + path_resized);
 
   // buffered images
   var bitmap_full = fs.readFileSync(filePath_full);
-  var bitmap_resized = fs.readFileSync(filePath_resize);
+  var bitmap_resized = fs.readFileSync(filePath_resized);
 
   // send converted images (base64) 
   res.send({
