@@ -379,9 +379,23 @@ router.post('/download_files', (req, res, next)=>{
 
   // abs path
   let filePath = path.join(__dirname, '../' + rel_path);
+  let fileName = path.basename(filePath)
   console.log('filePath', filePath)
+  console.log('fileName', fileName)
 
+  // res.setHeader('Content-Disposition', 'attachment; filename=' + fileName);
+  // res.setHeader('Content-Transfer-Encoding', 'binary');
+  // res.setHeader('Content-Type', 'application/octet-stream');
   res.sendFile(filePath)
+
+  // res.download(filePath, fileName, (err) => {
+  //   if (err) {
+  //     res.status(500).send({
+  //       message: "Could not download the file. " + err,
+  //     });
+  //   }
+  // });
+
 })
 
 module.exports = router;
