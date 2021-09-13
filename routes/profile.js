@@ -5,7 +5,8 @@ var multer = require('multer')
 const fs = require('fs')
 const path = require('path')
 const sharp = require('sharp')
-const zip = require('express-zip');
+const { promisify } = require('util')
+const sizeOf = promisify(require('image-size'))
 
 const router = express.Router();
 const db = require('../db/db');
@@ -16,7 +17,7 @@ const config = require('../config/config');
 
 const { val_key, time_key, unwrap} = require('../public/javascripts/wrapper')
 
-/* === Select from current logged user === */
+/* === SELECT INFO  === */
 
 // Get existed user
 router.post('/get', (req, res, next)=>{
@@ -272,8 +273,25 @@ router.post('/upload_img', multer({ storage: storage_img }).array('file'), async
     // Добавляем в ответ путь к resize img
     file['resized'] = resize_rel_path
     
+    // let new_h, new_w
+    // sizeOf(resize_abs_path)
+    //   .then(dimensions => { 
+    //       console.log('dimensions', dimensions);
+
+    //       let max_size = 200 // height or width
+    //       if(dimensions.width > dimensions.height) {
+    //         new_w = max_size
+    //         new_h = dimensions.height * (max_size / dimensions.width )
+    //       }
+    //       else {
+    //         new_w = mdimensions.width * (max_size / dimensions.height )
+    //         new_h = max_size 
+    //       }
+    //    })
+    //   .catch(err => console.error(err))
+
     await sharp(file.path)
-      .resize(200, 200)
+      .resize(200,200)
       .jpeg({ quality: 90 })
       .toFile(
         resize_abs_path
@@ -287,12 +305,11 @@ router.post('/download_img', (req, res, next)=>{
     body : {
       "mimetype": "image/png",
       "path":"public\\images\\full\\1631517937969-cake2.png",
-      "resize":"public\\images\\resized\\1631517937969-cake2.png",
-      "filename":"1631517937969-cake2.png"
+      "resize":"public\\images\\resized\\1631517937969-cake2.png"
     }
   */
 
-  let fileName = req.body.filename    // <name>
+  // let fileName = req.body.filename    // <name>
 
   // rel path
   let path_full = req.body.path    // public/images/<name>
@@ -317,8 +334,6 @@ router.post('/download_img', (req, res, next)=>{
   //   { path: filePath_resize, name: fileName}
   // ]);
 
-  // res.sendFile(filePath_full)
-
   // let options = {}
   // res.sendFile(filePath_full, options, function (err) {
   //   if (err) {
@@ -336,5 +351,6 @@ router.post('/download_img', (req, res, next)=>{
   //   }
   // });
 })
+ 
 
 module.exports = router;
