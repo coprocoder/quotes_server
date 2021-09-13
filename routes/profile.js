@@ -1,5 +1,9 @@
 const express = require('express');
+
+// For up/download files
 var multer = require('multer')
+const path = require('path')
+
 const router = express.Router();
 const db = require('../db/db');
 
@@ -224,7 +228,6 @@ router.post('/update', (req, res, next)=>{
 
 /* === FILES === */
 
-
 var storage_img = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, 'public/images')
@@ -237,51 +240,34 @@ var storage_img = multer.diskStorage({
 var uploadImg = multer({ storage: storage_img }).array('file')
 
 router.post('/upload_file', (req, res, next)=>{
-  console.log('upload_file', req)
   uploadImg(req, res, function (err) {
+    console.log('multer', req.files)
     if (err instanceof multer.MulterError) {
         console.log('multer.MulterError', err)
         return res.status(500).json(err)
-    } else if ('multer err', err) {
-        console.log(err)
+    } else if (err) {
+        console.log('multer err', err)
         return res.status(500).json(err)
     }
-    return res.status(200).send(req.file)
+    return res.status(200).send(req.files)
   })
+})
 
-  
-  // console.log('upload_file CUR req.body', req.body)
-  // console.log('upload_file CUR req.files', req.files)
+router.post('/download_file', (req, res, next)=>{
+  let uri_path = req.body.path    // public/images/<name>
+  let fileName = req.body.filename    // <name>
+  console.log('download_file uri_path', uri_path)
 
-  // var token_data = jwt.decode(req.headers.auth, config.secret, false, 'HS256')
-  // var filter = {'email':token_data.email};
-  // var update_fields = null
+  const filePath = path.join(__dirname, '../' + uri_path);
+  console.log('download_file filePath', filePath)
 
-  // // Преобразовываем входные данные в данные для NoSQL запроса
-  // if(!!req.body.url) {
-  //   update_fields = { [req.body.url]: req.body.value };
-  // }
-  // else{
-  //    res.send({code: -1, time: null, message: "Фильтр данных не задан"});
-  // }
-  // // console.log('upload_file CUR update_fields', update_fields)
-
-  // db
-  // .updloadFile(db.users_database, db.users_collection, filter, update_fields)
-  // .then((results)=>{
-  //   if (!!results){
-  //     res.send({
-  //       message: "Данные обновлены",
-  //       code: 0,
-  //       time: Date.now()
-  //     });
-  //   } else {
-  //     const err = new Error('Данные не обновлены!');
-  //     err.status = 400;
-  //     next(err);
-  //   }
-  // })
-  // .catch((err)=>{ next(err); })
+  res.download(filePath, fileName, (err) => {
+    if (err) {
+      res.status(500).send({
+        message: "Could not download the file. " + err,
+      });
+    }
+  });
 })
 
 module.exports = router;
