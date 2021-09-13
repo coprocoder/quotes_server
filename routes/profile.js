@@ -2,7 +2,10 @@ const express = require('express');
 
 // For up/download files
 var multer = require('multer')
+const fs = require('fs')
 const path = require('path')
+const sharp = require('sharp')
+const zip = require('express-zip');
 
 const router = express.Router();
 const db = require('../db/db');
@@ -230,44 +233,108 @@ router.post('/update', (req, res, next)=>{
 
 var storage_img = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'public/images')
+    cb(null, 'public/images/full')
   },
   filename: function (req, file, cb) {
     cb(null, Date.now() + '-' +file.originalname )
   }
 })
-// var uploadImg = multer({ storage: storage_img }).single('file')
-var uploadImg = multer({ storage: storage_img }).array('file')
+// var uploadImg = multer({ storage: storage_img })
 
-router.post('/upload_file', (req, res, next)=>{
-  uploadImg(req, res, function (err) {
-    console.log('multer', req.files)
-    if (err instanceof multer.MulterError) {
-        console.log('multer.MulterError', err)
-        return res.status(500).json(err)
-    } else if (err) {
-        console.log('multer err', err)
-        return res.status(500).json(err)
+router.post('/upload_img', multer({ storage: storage_img }).array('file'), async (req, res) => {
+  /* 
+    res.files : [
+      { file_info1},
+      { file_info2},
+      ...
+    ]
+
+    ex: {
+      destination: "public/images/full",
+      encoding: "7bit",
+      fieldname: "file",
+      filename: "1631521695124-cake.jpg",
+      mimetype: "image/jpeg",
+      originalname: "cake.jpg",
+      path: "public\\images\\full\\1631521695124-cake.jpg",
+      resize: "public\\images\\resized\\1631521695124-cake.jpg",
+      size: 175981
     }
-    return res.status(200).send(req.files)
-  })
+  */
+
+  console.log('multer files', req.files)
+
+  for(let i in req.files) {
+    let file = req.files[i]
+    let resize_abs_path = path.resolve(path.join(file.destination,'../'),  'resized', file.filename)
+    let resize_rel_path = path.join(file.destination,'../resized', file.filename);
+
+    // Добавляем в ответ путь к resize img
+    file['resize'] = resize_rel_path
+    
+    await sharp(file.path)
+      .resize(200, 200)
+      .jpeg({ quality: 90 })
+      .toFile(
+        resize_abs_path
+      )
+  }
+  return res.status(200).send(req.files)
 })
 
-router.post('/download_file', (req, res, next)=>{
-  let uri_path = req.body.path    // public/images/<name>
-  let fileName = req.body.filename    // <name>
-  console.log('download_file uri_path', uri_path)
-
-  const filePath = path.join(__dirname, '../' + uri_path);
-  console.log('download_file filePath', filePath)
-
-  res.download(filePath, fileName, (err) => {
-    if (err) {
-      res.status(500).send({
-        message: "Could not download the file. " + err,
-      });
+router.post('/download_img', (req, res, next)=>{
+  /*
+    body : {
+      "mimetype": "image/png",
+      "path":"public\\images\\full\\1631517937969-cake2.png",
+      "resize":"public\\images\\resized\\1631517937969-cake2.png",
+      "filename":"1631517937969-cake2.png"
     }
-  });
+  */
+
+  let fileName = req.body.filename    // <name>
+
+  // rel path
+  let path_full = req.body.path    // public/images/<name>
+  let path_resize = req.body.resize    // public/images/<name>
+
+  // abs path
+  let filePath_full = path.join(__dirname, '../' + path_full);
+  let filePath_resize = path.join(__dirname, '../' + path_resize);
+
+  // buffered images
+  var bitmap_full = fs.readFileSync(filePath_full);
+  var bitmap_resized = fs.readFileSync(filePath_resize);
+
+  // send converted images (base64) 
+  res.send({
+    full: 'data:' + req.body.mimetype + ';base64,' + Buffer(bitmap_full).toString('base64'),
+    resized: 'data:' + req.body.mimetype + ';base64,' + Buffer(bitmap_resized).toString('base64')
+  })
+
+  // res.zip([
+  //   { path: filePath_full, name: fileName },
+  //   { path: filePath_resize, name: fileName}
+  // ]);
+
+  // res.sendFile(filePath_full)
+
+  // let options = {}
+  // res.sendFile(filePath_full, options, function (err) {
+  //   if (err) {
+  //       next(err);
+  //   } else {
+  //       console.log('Sent full:', fileName);
+  //   }
+  // })
+
+  // res.download(filePath_full, fileName, (err) => {
+  //   if (err) {
+  //     res.status(500).send({
+  //       message: "Could not download the file. " + err,
+  //     });
+  //   }
+  // });
 })
 
 module.exports = router;
