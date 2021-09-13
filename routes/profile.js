@@ -383,9 +383,8 @@ router.post('/download_files', (req, res, next)=>{
   console.log('filePath', filePath)
   console.log('fileName', fileName)
 
-  // res.setHeader('Content-Disposition', 'attachment; filename=' + fileName);
-  // res.setHeader('Content-Transfer-Encoding', 'binary');
-  // res.setHeader('Content-Type', 'application/octet-stream');
+  // res.setHeader('filename', fileName);
+  // res.setHeader('Access-Control-Expose-Headers', 'Content-Disposition');
   res.sendFile(filePath)
 
   // res.download(filePath, fileName, (err) => {
