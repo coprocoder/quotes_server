@@ -106,12 +106,29 @@ app.all('/', function (req, res, next) {
 //   })
 // });
 
+// app.use('/', function(req,res, next) {
+//     var filePath = '.' + req.url;
+//     console.log('filepath', filePath)
+  
+//     var extname = path.extname(filePath);
+//     var contentType = mimetypes[extname]
+//     console.log('contentType', contentType)
+    
+//     if(!!contentType) {
+//         filePath = path.join(__dirname, filePath)
+//         res.sendFile(filePath)
+//     }
+//     else
+//         next()
+// })
+
 //### Routers Files
 var indexRouter = require('./routes/index');
 var authRouter = require('./routes/auth');
 var profileRouter = require('./routes/profile');
 var anyUserRouter = require('./routes/any_user');
 var publicDataRouter = require('./routes/public');
+var filesRouter = require('./routes/files');
 
 //### Routes
 app.use('/', indexRouter);             // Корень, базовые страницы
@@ -119,6 +136,7 @@ app.use('/auth', authRouter);          // Авторизация/регистр�
 app.use('/profile', profileRouter);    // Текущий пользователь
 app.use('/users', anyUserRouter);      // Все пользователи
 app.use('/public', publicDataRouter);  // Данные из открытой БД для страниц сайта
+app.use('/files', filesRouter);  // Данные из открытой БД для страниц сайта
 
 
 /* ### === Error handlers block === */
