@@ -24,7 +24,7 @@ module.exports = user_preset_config = {
                 }
             ],
             "aggChart": 0,
-            "timeMode": 0,
+            "period": 0,
             "title": "Сердцебиение и сатурация",
             "wide": false
         },
@@ -71,7 +71,7 @@ module.exports = user_preset_config = {
                 }
             ],
             "aggChart": 0,
-            "timeMode": 0,
+            "period": 0,
             "title": "Водный баланс",
             "wide": true
         },
@@ -99,7 +99,7 @@ module.exports = user_preset_config = {
                 }
             ],
             "aggChart": 0,
-            "timeMode": 0,
+            "period": 0,
             "title": "Давление",
             "wide": true
         },
@@ -118,7 +118,7 @@ module.exports = user_preset_config = {
                 }
             ],
             "aggChart": 0,
-            "timeMode": 0,
+            "period": 0,
             "title": "Температура",
             "wide": true
         },
@@ -137,7 +137,7 @@ module.exports = user_preset_config = {
                 }
             ],
             "aggChart": 0,
-            "timeMode": 0,
+            "period": 0,
             "title": "Рост",
             "wide": true
         },
@@ -156,7 +156,7 @@ module.exports = user_preset_config = {
                 }
             ],
             "aggChart": 0,
-            "timeMode": 0,
+            "period": 0,
             "title": "Вес",
             "wide": true
         },
@@ -183,7 +183,7 @@ module.exports = user_preset_config = {
                 }
             ],
             "aggChart": 0,
-            "timeMode": 0,
+            "period": 0,
             "title": "ИМТ",
             "wide": true
         },
@@ -202,7 +202,7 @@ module.exports = user_preset_config = {
                 }
             ],
             "aggChart": 0,
-            "timeMode": 0,
+            "period": 0,
             "title": "Сахар",
             "wide": true
         },
@@ -225,7 +225,7 @@ module.exports = user_preset_config = {
                 }
             ],
             "aggChart": 0,
-            "timeMode": 0,
+            "period": 0,
             "title": "Активность",
             "wide": true
         },
@@ -248,7 +248,7 @@ module.exports = user_preset_config = {
                 }
             ],
             "aggChart": 0,
-            "timeMode": 0,
+            "period": 0,
             "title": "Шаги",
             "wide": true
         }
