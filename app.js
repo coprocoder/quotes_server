@@ -6,6 +6,7 @@ var fs = require('fs');
 var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var cons = require('consolidate');
+var mimetypes = require("./config/mimetypes.js")
 
 //### Mongo sessions
 var mongoose = require("mongoose")
@@ -106,21 +107,24 @@ app.all('/', function (req, res, next) {
 //   })
 // });
 
-// app.use('/', function(req,res, next) {
-//     var filePath = '.' + req.url;
-//     console.log('filepath', filePath)
-  
-//     var extname = path.extname(filePath);
-//     var contentType = mimetypes[extname]
-//     console.log('contentType', contentType)
+app.use('/', function(req,res, next) {
+    var filePath = '.' + req.url;
+    console.log('filepath', filePath)
     
-//     if(!!contentType) {
-//         filePath = path.join(__dirname, filePath)
-//         res.sendFile(filePath)
-//     }
-//     else
-//         next()
-// })
+    var extname = path.extname(filePath);
+    console.log('extname', extname)
+    console.log('mimetypes', mimetypes)
+    var contentType = mimetypes[extname]
+    console.log('contentType', contentType)
+    
+    if(!!contentType) {
+        filePath = path.join(__dirname, filePath)
+        console.log('filepath join', filePath)
+        res.sendFile(filePath)
+    }
+    else
+        next()
+})
 
 //### Routers Files
 var indexRouter = require('./routes/index');
