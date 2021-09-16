@@ -108,18 +108,12 @@ app.all('/', function (req, res, next) {
 // });
 
 app.use('/', function(req,res, next) {
-    var filePath = '.' + req.url;
-    console.log('filepath', filePath)
-    
+    var filePath = '.' + req.url;    
     var extname = path.extname(filePath);
-    console.log('extname', extname)
-    console.log('mimetypes', mimetypes)
     var contentType = mimetypes[extname]
-    console.log('contentType', contentType)
     
     if(!!contentType) {
         filePath = path.join(__dirname, filePath)
-        console.log('filepath join', filePath)
         res.sendFile(filePath)
     }
     else
@@ -130,17 +124,19 @@ app.use('/', function(req,res, next) {
 var indexRouter = require('./routes/index');
 var authRouter = require('./routes/auth');
 var profileRouter = require('./routes/profile');
-var anyUserRouter = require('./routes/any_user');
+var usersRouter = require('./routes/users');
 var publicDataRouter = require('./routes/public');
 var filesRouter = require('./routes/files');
+var catalogRouter = require('./routes/catalog');
 
 //### Routes
 app.use('/', indexRouter);             // Корень, базовые страницы
 app.use('/auth', authRouter);          // Авторизация/регистрация
 app.use('/profile', profileRouter);    // Текущий пользователь
-app.use('/users', anyUserRouter);      // Все пользователи
+app.use('/users', usersRouter);        // Все пользователи
 app.use('/public', publicDataRouter);  // Данные из открытой БД для страниц сайта
-app.use('/files', filesRouter);  // Данные из открытой БД для страниц сайта
+app.use('/files', filesRouter);        // Up/Download files
+app.use('/catalog', catalogRouter);    // Справочники
 
 
 /* ### === Error handlers block === */

@@ -10,6 +10,11 @@ module.exports.secure_collection = 'users';
 
 module.exports.public_database = 'publicdb';
 
+module.exports.catalog_database = 'catalogdb';
+module.exports.catalog_collection_med = 'med';
+module.exports.catalog_collection_diary = 'diary';
+module.exports.catalog_collection_variable = 'variable';
+
 const conversion = require('../db/data_conversion');
 
 
