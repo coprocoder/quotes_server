@@ -19,6 +19,7 @@
     "express": "^4.16.4",
     "express-session": "^1.17.1",
     "express-zip": "^3.0.0",
+    "firebase-admin": "^9.11.1",
     "fs": "0.0.1-security",
     "gridfs-stream": "^1.1.1",
     "http-errors": "~1.6.3",
