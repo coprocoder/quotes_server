@@ -6,7 +6,7 @@ var multer = require('multer')
 const fs = require('fs')
 const path = require('path')
 const sharp = require('sharp')
-const { promisify } = require('util')
+const { promisify } = require('util');
 const sizeOf = promisify(require('image-size'))
 
 /* === FILES === */

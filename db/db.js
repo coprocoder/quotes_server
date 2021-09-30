@@ -101,7 +101,7 @@ module.exports.remove = function(cur_db, cur_collection, filter, fields) {
         client
           .db(cur_db)
           .collection(cur_collection)
-          .update(
+          .updateOne(
             filter,
             { $unset: fields},     // Remove fields
             function(err, results){

@@ -128,6 +128,7 @@ var usersRouter = require('./routes/users');
 var publicDataRouter = require('./routes/public');
 var filesRouter = require('./routes/files');
 var catalogRouter = require('./routes/catalog');
+var messagingRouter = require('./routes/firebase/messaging');
 
 //### Routes
 app.use('/', indexRouter);             // Корень, базовые страницы
@@ -137,6 +138,7 @@ app.use('/users', usersRouter);        // Все пользователи
 app.use('/public', publicDataRouter);  // Данные из открытой БД для страниц сайта
 app.use('/files', filesRouter);        // Up/Download files
 app.use('/catalog', catalogRouter);    // Справочники
+app.use('/messaging', messagingRouter);    // Справочники
 
 /* ### === Error handlers block === */
 
