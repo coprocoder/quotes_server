@@ -15,8 +15,10 @@ const wrap = (obj, time) => {
 }
 
 const unwrap = (obj) => {
-    // console.log('unwrap args', obj)
+    console.log('unwrap args', obj)
     obj = JSON.parse(JSON.stringify(obj[val_key]))
+    if (obj && obj._id)
+        delete obj._id
     if (Object.prototype.isPrototypeOf(obj) && !Array.prototype.isPrototypeOf(obj))
         Object.keys(obj).forEach(k => {
             obj[k] = unwrap(obj[k])

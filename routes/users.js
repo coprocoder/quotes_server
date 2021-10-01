@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const db = require('../db/db');
+const { val_key, time_key, unwrap } = require('../public/javascripts/wrapper')
 
 /* === Select fields from ALL === */
 
@@ -70,7 +71,11 @@ router.post('/find', (req, res, next)=>{
   console.log('find user GET CUR query_fields', query_fields)
 
   var filter = { $and: query_fields };
-  var fields = {}
+  var fields = {
+    email: 1,
+    username: 1,
+    personal: 1
+  }
 
   console.log('find user GET CUR filter', filter)
   // res.send(filter);
@@ -79,8 +84,12 @@ router.post('/find', (req, res, next)=>{
     .get(db.users_database, db.users_collection, filter, fields)
     .then((results)=>{
       console.log('find user GET CUR results', results)
+      // console.log('unwrap', unwrap(results[0]))
       if(results.length)
-        res.send(results);
+        res.send(results.map(item => unwrap({
+          [val_key]: item,
+          [time_key]: null
+        })));
       else
         res.send({});
 
