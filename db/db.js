@@ -1,6 +1,8 @@
 const MongoClient = require('mongodb').MongoClient;
 const ObjectID = require('mongodb').ObjectID;
-const url = "mongodb://localhost:27017/";
+const config = require('../config/config.json')
+
+const url = process.env.MONGODB_URI || config.db;
 
 module.exports.users_database = 'usersdb';
 module.exports.users_collection = 'users';

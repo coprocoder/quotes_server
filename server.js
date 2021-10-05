@@ -7,6 +7,7 @@
 var app = require('./app');
 var debug = require('debug')('node-test:server');
 var http = require('http');
+const config = require('./config/config.json');
 
 /**
  * Get port from environment and store in Express.
@@ -31,7 +32,7 @@ var server = http.createServer(app);
 
 // Задаём параметры подключения к БД
 const MongoClient = require("mongodb").MongoClient;
-const url_db = "mongodb://localhost:27017";
+const url_db = process.env.MONGODB_URI || config.db;
 const mongoClient = new MongoClient(url_db, { useUnifiedTopology: true});
 
 mongoClient.connect(function(err, client){

@@ -7,6 +7,7 @@ var cookieParser = require('cookie-parser');
 var logger = require('morgan');
 var cons = require('consolidate');
 var mimetypes = require("./config/mimetypes.js")
+var config = require('./config/config.json')
 
 //### Mongo sessions
 var mongoose = require("mongoose")
@@ -70,7 +71,7 @@ var sess = {
         expires : 300000,
     },
     store: new MongoStore({
-        url: 'mongodb://localhost:27017/usersdb'
+        url: process.env.MONGODB_URI || (config.db + '/usersdb')
     }),
     rolling: true,
 }
