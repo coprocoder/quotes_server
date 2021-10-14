@@ -13,7 +13,7 @@ const sizeOf = promisify(require('image-size'))
 
 var storage_img = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'public/images/full')
+    cb(null, 'public/storage/images/full')
   },
   filename: function (req, file, cb) {
     cb(null, Date.now() + '-' +file.originalname )
@@ -21,7 +21,7 @@ var storage_img = multer.diskStorage({
 })
 var storage_files = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'public/files')
+    cb(null, 'public/storage/files')
   },
   filename: function (req, file, cb) {
     cb(null, Date.now() + '-' +file.originalname )
