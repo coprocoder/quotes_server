@@ -1,18 +1,28 @@
-var createError = require('http-errors');
+const createError = require('http-errors');
 const cors = require('cors');
-var express = require('express');
-var path = require('path');
-var fs = require('fs');
-var cookieParser = require('cookie-parser');
-var logger = require('morgan');
-var cons = require('consolidate');
-var mimetypes = require("./config/mimetypes.js")
-var config = require('./config/config.json')
+const express = require('express');
+const path = require('path');
+const fs = require('fs');
+const cookieParser = require('cookie-parser');
+const logger = require('morgan');
+const cons = require('consolidate');
+const mimetypes = require("./config/mimetypes.js")
+const config = require('./config/config.json')
 
 //### Mongo sessions
-var mongoose = require("mongoose")
-var session = require('express-session')
-var MongoStore = require('connect-mongo')(session);
+const mongoose = require("mongoose")
+const session = require('express-session')
+const MongoStore = require('connect-mongo')(session);
+
+
+//### Routers Files
+const indexRouter = require('./routes/index');
+const authRouter = require('./routes/auth');
+const profileRouter = require('./routes/profile');
+const usersRouter = require('./routes/users');
+const filesRouter = require('./routes/files');
+const catalogRouter = require('./routes/catalog');
+const messagingRouter = require('./routes/firebase/messaging');
 
 var app = express();
 app.use(cors());
@@ -121,22 +131,11 @@ app.use('/', function(req,res, next) {
         next()
 })
 
-//### Routers Files
-var indexRouter = require('./routes/index');
-var authRouter = require('./routes/auth');
-var profileRouter = require('./routes/profile');
-var usersRouter = require('./routes/users');
-var publicDataRouter = require('./routes/public');
-var filesRouter = require('./routes/files');
-var catalogRouter = require('./routes/catalog');
-var messagingRouter = require('./routes/firebase/messaging');
-
 //### Routes
 app.use('/', indexRouter);             // Корень, базовые страницы
 app.use('/auth', authRouter);          // Авторизация/регистрация
 app.use('/profile', profileRouter);    // Текущий пользователь
 app.use('/users', usersRouter);        // Все пользователи
-app.use('/public', publicDataRouter);  // Данные из открытой БД для страниц сайта
 app.use('/files', filesRouter);        // Up/Download files
 app.use('/catalog', catalogRouter);    // Справочники
 app.use('/messaging', messagingRouter);    // Справочники
