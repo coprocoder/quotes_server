@@ -1,0 +1,12 @@
+[Unit]
+Description=Med server
+
+[Service]
+#Type=simple
+#ExecStart=/bin/bash /home/welladmin/newmed_server/run.sh
+ExecStart=/usr/bin/node server.js
+WorkingDirectory=/home/welladmin/newmed_server
+#Restart=always
+
+[Install]
+WantedBy=multi-user.target
