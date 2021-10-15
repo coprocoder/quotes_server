@@ -1,256 +1,240 @@
 
 module.exports = user_preset_config = {
     "diary": {
-        "1630996383833": {
-            "backgroundColor": 14,
+        "1634114490564": {
+            "backgroundColor": 0,
             "chartType": 0,
-            "chartValues": [{
-                    "variables": [{
-                            "name": "1630995763300",
-                            "constant": null
-                        }
-                    ],
-                    "color": 2,
-                    "isOut": true,
-                    "key": "1",
-                    "postfix": "Уд/мин"
-                }, {
-                    "variables": [{
-                            "name": "1630995906100",
-                            "constant": null
-                        }
-                    ],
-                    "color": 13
-                }
-            ],
-            "aggChart": 0,
-            "period": 0,
-            "title": "Сердцебиение и сатурация",
-            "wide": false
-        },
-        "1630996617585": {
-            "backgroundColor": 4,
-            "chartType": 1,
-            "chartValues": [{
-                    "variables": [{
-                            "name": "1630996090449",
-                            "constant": null
-                        }
-                    ],
-                    "color": 3,
-                    "isOut": true,
-                    "key": "1",
-                    "postfix": "-"
-                }, {
-                    "variables": [{
-                            "name": "1630996108516",
-                            "constant": null
-                        },
+            "chartValues": [
+                {
+                    "variables": [
                         {
-                            "name": null,
-                            "pre": "*",
-                            "constant": -1
+                            "variable": {
+                                "icon": "faHamburger",
+                                "color": 7,
+                                "limit_min": "40",
+                                "limit_max": "220",
+                                "locale": {
+                                    "ru": "Частота сердцебиения"
+                                }
+                            },
+                            "name": "1634114472907",
+                            "constant": null
                         }
                     ],
                     "color": 0,
-                    "isOut": true,
-                    "postfix": "="
-                }, {
-                    "variables": [{
-                            "name": "1630996090449",
-                            "constant": null
-                        }, {
-                            "pre": "-",
-                            "name": "1630996108516",
-                            "constant": null
-                        }
-                    ],
-                    "color": 6,
-                    "isOut": true,
-                    "postfix": "мл"
+                    "useResult": true,
+                    "key": "1"
                 }
             ],
-            "aggChart": 0,
-            "period": 0,
-            "title": "Водный баланс",
-            "wide": true
+            "title": "ЧСС",
+            "wide": false,
+            "period": 2,
+            "icon": "freq"
         },
-        "1630996673449": {
-            "backgroundColor": 3,
+        "1634114605842": {
+            "backgroundColor": 1,
+            "chartType": 2,
+            "chartValues": [
+                {
+                    "variables": [
+                        {
+                            "name": "1630995906100",
+                            "constant": null
+                        },
+                        {
+                            "pre": "/",
+                            "constant": "100",
+                            "name": null
+                        }
+                    ],
+                    "color": 1,
+                    "useResult": true,
+                    "key": "1"
+                }
+            ],
+            "chartAgg": 0,
+            "title": "Сатурация",
+            "wide": false,
+            "period": 0,
+            "icon": "saturation"
+        },
+        "1634114663398": {
+            "backgroundColor": 2,
             "chartType": 0,
-            "chartValues": [{
-                    "variables": [{
+            "chartValues": [
+                {
+                    "variables": [
+                        {
                             "name": "1630995981550",
                             "constant": null
                         }
                     ],
-                    "color": 4,
-                    "isOut": true,
-                    "key": "1",
-                    "postfix": "/"
-                }, {
-                    "variables": [{
+                    "color": 8,
+                    "useResult": true,
+                    "suf": "/",
+                    "key": "1"
+                },
+                {
+                    "variables": [
+                        {
                             "name": "1630996003416",
                             "constant": null
                         }
                     ],
                     "color": 5,
-                    "isOut": true
+                    "useResult": true
                 }
             ],
-            "aggChart": 0,
-            "period": 0,
             "title": "Давление",
-            "wide": true
-        },
-        "1630996723799": {
-            "backgroundColor": 1,
-            "chartType": 0,
-            "chartValues": [{
-                    "variables": [{
-                            "name": "1630995855883",
-                            "constant": null
-                        }
-                    ],
-                    "color": 2,
-                    "isOut": true,
-                    "key": "1"
-                }
-            ],
-            "aggChart": 0,
+            "wide": true,
             "period": 0,
-            "title": "Температура",
-            "wide": true
+            "icon": "pressure"
         },
-        "1630996785719": {
-            "backgroundColor": 6,
-            "chartType": 0,
-            "chartValues": [{
-                    "variables": [{
-                            "name": "1630995828816",
-                            "constant": null
-                        }
-                    ],
-                    "color": 4,
-                    "isOut": true,
-                    "key": "1"
-                }
-            ],
-            "aggChart": 0,
-            "period": 0,
-            "title": "Рост",
-            "wide": true
-        },
-        "1630997069399": {
-            "backgroundColor": 3,
-            "chartType": 0,
-            "chartValues": [{
-                    "variables": [{
-                            "name": "1630995796983",
-                            "constant": null
-                        }
-                    ],
-                    "color": 4,
-                    "isOut": true,
-                    "key": "1"
-                }
-            ],
-            "aggChart": 0,
-            "period": 0,
-            "title": "Вес",
-            "wide": true
-        },
-        "1630997150649": {
-            "backgroundColor": 5,
-            "chartType": 0,
-            "chartValues": [{
-                    "variables": [{
-                            "name": "1630995796983",
-                            "constant": null
-                        }, {
-                            "pre": "/",
-                            "name": "1630995828816",
-                            "constant": null
-                        }, {
-                            "pre": "/",
-                            "name": "1630995828816",
-                            "constant": null
-                        }
-                    ],
-                    "color": 6,
-                    "isOut": true,
-                    "key": "1"
-                }
-            ],
-            "aggChart": 0,
-            "period": 0,
-            "title": "ИМТ",
-            "wide": true
-        },
-        "1630997186250": {
-            "backgroundColor": 6,
-            "chartType": 0,
-            "chartValues": [{
-                    "variables": [{
-                            "name": "1630996199466",
-                            "constant": null
-                        }
-                    ],
-                    "color": 4,
-                    "isOut": true,
-                    "key": "1"
-                }
-            ],
-            "aggChart": 0,
-            "period": 0,
-            "title": "Сахар",
-            "wide": true
-        },
-        "1630997244350": {
+        "1634114806981": {
             "backgroundColor": 3,
             "chartType": 2,
-            "chartValues": [{
-                    "variables": [{
-                            "name": "1630996041650",
-                            "constant": null
-                        }, {
-                            "pre": "/",
-                            "constant": "300",
-                            "name": null
-                        }
-                    ],
-                    "color": 4,
-                    "isOut": true,
-                    "key": "1"
-                }
-            ],
-            "aggChart": 0,
-            "period": 0,
-            "title": "Активность",
-            "wide": true
-        },
-        "1630997280516": {
-            "backgroundColor": 7,
-            "chartType": 2,
-            "chartValues": [{
-                    "variables": [{
+            "chartValues": [
+                {
+                    "variables": [
+                        {
                             "name": "1630996055866",
                             "constant": null
-                        }, {
+                        },
+                        {
                             "pre": "/",
                             "constant": "10000",
                             "name": null
                         }
                     ],
-                    "color": 4,
-                    "isOut": true,
+                    "color": 3,
+                    "useResult": true,
                     "key": "1"
                 }
             ],
-            "aggChart": 0,
-            "period": 0,
             "title": "Шаги",
-            "wide": true
+            "wide": false,
+            "period": 0,
+            "icon": "steps"
+        },
+        "1634115281395": {
+            "backgroundColor": 4,
+            "chartType": 1,
+            "chartValues": [
+                {
+                    "variables": [
+                        {
+                            "name": "1630995855883",
+                            "constant": null
+                        }
+                    ],
+                    "color": 4,
+                    "useResult": true,
+                    "key": "1"
+                }
+            ],
+            "title": "Температура",
+            "wide": false,
+            "period": 0,
+            "icon": "temperature"
+        },
+        "1634115353627": {
+            "backgroundColor": 5,
+            "chartType": 1,
+            "chartValues": [
+                {
+                    "variables": [
+                        {
+                            "name": "1630996199466",
+                            "constant": null
+                        }
+                    ],
+                    "color": 5,
+                    "useResult": true,
+                    "key": "1"
+                }
+            ],
+            "title": "Сахар",
+            "wide": false,
+            "period": 1,
+            "icon": "glu"
+        },
+        "1634115451059": {
+            "backgroundColor": 6,
+            "chartType": 3,
+            "chartValues": [
+                {
+                    "variables": [
+                        {
+                            "name": "1630995796983",
+                            "constant": null
+                        }
+                    ],
+                    "color": 6,
+                    "useResult": true,
+                    "key": "1"
+                }
+            ],
+            "title": "Вес",
+            "wide": false,
+            "period": 2,
+            "icon": "weight"
+        },
+        "1634115471433": {
+            "backgroundColor": 7,
+            "chartType": 3,
+            "chartValues": [
+                {
+                    "variables": [
+                        {
+                            "name": "1630995828816",
+                            "constant": null
+                        }
+                    ],
+                    "color": 7,
+                    "useResult": true,
+                    "key": "1"
+                }
+            ],
+            "title": "Рост",
+            "wide": false,
+            "period": 2,
+            "icon": "height"
+        },
+        "1634115521251": {
+            "backgroundColor": 8,
+            "chartType": 3,
+            "chartValues": [
+                {
+                    "variables": [
+                        {
+                            "name": "1630995796983",
+                            "constant": null
+                        },
+                        {
+                            "pre": "/",
+                            "name": "1630995828816",
+                            "constant": null
+                        },
+                        {
+                            "pre": "/",
+                            "name": "1630995828816",
+                            "constant": null
+                        },
+                        {
+                            "pre": "*",
+                            "name": null,
+                            "constant": 10000
+                        }
+                    ],
+                    "color": 8,
+                    "useResult": true,
+                    "key": "1"
+                }
+            ],
+            "title": "ИМТ",
+            "wide": false,
+            "period": 2,
+            "icon": "bmi"
         }
     },
     "variables": {
@@ -362,6 +346,5 @@ module.exports = user_preset_config = {
                 "ru": "Сахар"
             }
         }
-    }
-    
+    }  
 };

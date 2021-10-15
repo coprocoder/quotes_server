@@ -216,4 +216,42 @@ router.post('/update', (req, res, next)=>{
     })
 })
 
+// Fill profile diary random values
+router.post('/fill_diary', (req, res, next)=>{
+ 
+  console.log('FILL CUR req.body', req.body)
+
+  var token_data = jwt.decode(req.headers.auth, config.secret, false, 'HS256')
+  var filter = {'email':token_data.email};
+  
+  var update_fields = null
+  var get_fields = {'diary': 1};
+
+  db
+    .get(db.users_database, db.users_collection, filter, get_fields)
+    .then((get_results)=>{
+      console.log('FILL CUR get_results', get_results)
+      
+      // db
+      //   .update(db.users_database, db.users_collection, filter, update_fields)
+      //   .then((results)=>{
+      //     if (!!results){
+      //       res.send({
+      //         message: "Данные обновлены",
+      //         code: 0,
+      //         time: new Date.now()
+      //       });
+      //     } else {
+      //       const err = new Error('Данные не обновлены!');
+      //       err.status = 400;
+      //       next(err);
+      //     }
+      //   })
+      //   .catch((err)=>{ next(err); })
+    })
+    .catch((err)=>{
+      next(err);
+    })
+})
+
 module.exports = router;
