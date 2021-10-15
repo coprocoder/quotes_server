@@ -132,13 +132,13 @@ app.use('/', function(req,res, next) {
 })
 
 //### Routes
-app.use('/', indexRouter);             // Корень, базовые страницы
-app.use('/auth', authRouter);          // Авторизация/регистрация
-app.use('/profile', profileRouter);    // Текущий пользователь
-app.use('/users', usersRouter);        // Все пользователи
-app.use('/files', filesRouter);        // Up/Download files
-app.use('/catalog', catalogRouter);    // Справочники
-app.use('/messaging', messagingRouter);    // Справочники
+app.use('/api', indexRouter);             // Корень, базовые страницы
+app.use('/api/auth', authRouter);          // Авторизация/регистрация
+app.use('/api/profile', profileRouter);    // Текущий пользователь
+app.use('/api/users', usersRouter);        // Все пользователи
+app.use('/api/files', filesRouter);        // Up/Download files
+app.use('/api/catalog', catalogRouter);    // Справочники
+app.use('/api/messaging', messagingRouter);    // Справочники
 
 /* ### === Error handlers block === */
 
