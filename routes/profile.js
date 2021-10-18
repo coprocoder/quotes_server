@@ -28,14 +28,12 @@ router.post('/get', (req, res, next)=>{
   var token_data = jwt.decode(req.headers.auth, config.secret, false, 'HS256')
   console.log('GET CUR token_data', token_data)
   var filter = {'_id': token_data.id};
-  var fields = {}
+  var fields = !!req.body.url ? {[req.body.url]: 1} : {}
 
   db
     .get(db.users_database, db.users_collection, filter, fields)
     .then((results)=>{
       console.log('GET CUR results', results)
-      console.log('GET CUR results', JSON.stringify(unwrap(results[0].diary)))
-      console.log('GET CUR results', JSON.stringify(unwrap(results[0].variables)))
 
       // Достаём по url нужное вложенное поле из результата
       let results_found_field = results[0]

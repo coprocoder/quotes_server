@@ -89,6 +89,14 @@ router.post('/upload_img', uploadImg.array('file'), async (req, res) => {
   return res.status(200).send(req.files)
 })
 
+router.post('/upload_files', uploadFiles.array('file'), async (req, res) => {
+  console.log('multer files', req.files)
+  return res.status(200).send(req.files)
+})
+
+/* =================
+    DEPRECATED (get access by http URL)
+   ================= */
 router.post('/download_img', (req, res, next)=>{
   /*
     body : {
@@ -124,12 +132,10 @@ router.post('/download_img', (req, res, next)=>{
     //   }
     // });
 })
- 
-router.post('/upload_files', uploadFiles.array('file'), async (req, res) => {
-  console.log('multer files', req.files)
-  return res.status(200).send(req.files)
-})
 
+/* =================
+    DEPRECATED (get access by http URL )
+   ================= */
 router.post('/download_files', (req, res, next)=>{
   console.log('download_files req.body', req.body)
 

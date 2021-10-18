@@ -2,8 +2,6 @@
 $(document).ready(function(){
 
     // Проверка авторизации юзера при загрузке страницы
-    var login_btn = $('<a id="login_btn">Login</a>');
-    var logout_btn = $('<a id="logout_btn">Logout</a>');
     if($('#userdata').attr('user') == ''){
         $('#login_btn').css({'display':'block'});
         $('#logout_btn').css({'display':'none'});

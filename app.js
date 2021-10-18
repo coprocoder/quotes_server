@@ -10,7 +10,7 @@ const mimetypes = require("./config/mimetypes.js")
 const config = require('./config/config.json')
 
 //### Mongo sessions
-const mongoose = require("mongoose")
+// const mongoose = require("mongoose")
 const session = require('express-session')
 const MongoStore = require('connect-mongo')(session);
 
@@ -33,7 +33,6 @@ app.engine('html', cons.swig)
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'html');
 
-//app.use(favicon());
 app.use(logger('dev'));
 
 //### req.body parse
@@ -65,7 +64,7 @@ app.use(function(req, res, next){
     next();
 });
 
-//### Sessions
+//### Sessions (saved in cache)
 var sess = {
     secret: 'super_secret_word', // секретное слово для шифрования
     credentials: 'include',
@@ -76,8 +75,8 @@ var sess = {
         httpOnly: true,     // чтобы куку не могли читать на клиенте
 
         // время жизни куки в милисекундах(null = infinity, 3600000 = 1 Hour)
-//        expires: new Date(Date.now() + 30000), // не работает, дата устанавливается на момент запуска сервера, время жизни отрицательное
-//        expires: false // infinity live time   // сессии не убиваются
+        // expires: new Date(Date.now() + 30000), // не работает, дата устанавливается на момент запуска сервера, время жизни отрицательное
+        // expires: false // infinity live time   // сессии не убиваются
         expires : 300000,
     },
     store: new MongoStore({
@@ -93,15 +92,15 @@ if (app.get('env') === 'production') {
 app.use(session(sess))
 
 //### Запись и хранение данных в куки
-app.all('/', function (req, res, next) {
-    // в независимости от логина или нет получаем id
-    console.log(req.sessionID);
+// app.all('/', function (req, res, next) {
+//     // в независимости от логина или нет получаем id
+//     console.log(req.sessionID);
 
-    // в сессию мы можем проставлять кастомные переменные
-    req.session.views = req.session.views === void 0 ? 0 : req.session.views;
-    req.session.views++;
-    next();
-})
+//     // в сессию мы можем проставлять кастомные переменные
+//     req.session.views = req.session.views === void 0 ? 0 : req.session.views;
+//     req.session.views++;
+//     next();
+// })
 
 //### Check auth (on all route except route /auth) = /\/((?!route1|route2).)*/
 // app.use(/\/((?!auth).)*/, function(req, res, next){
@@ -118,6 +117,7 @@ app.all('/', function (req, res, next) {
 //   })
 // });
 
+//### Проверка URL по его окончанию. Если файл, то вернуть его, иначе перейти по маршруту
 app.use('/', function(req,res, next) {
     var filePath = '.' + req.url;    
     var extname = path.extname(filePath);
