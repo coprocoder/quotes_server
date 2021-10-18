@@ -5,7 +5,7 @@ const jwt = require('jwt-simple');
 const config = require('../config/config');
 
 
-const { val_key, time_key, unwrap} = require('../public/javascripts/wrapper')
+const { val_key, time_key, wrap, unwrap} = require('../public/javascripts/wrapper')
 
 /* === SELECT INFO  === */
 
@@ -218,36 +218,101 @@ router.post('/update', (req, res, next)=>{
 
 // Fill profile diary random values
 router.post('/fill_diary', (req, res, next)=>{
+  /*
+    req.body: {
+      count: <Int number> // Количество сгенерированных записей для добавления
+    }
+  */
  
-  console.log('FILL CUR req.body', req.body)
+  // console.log('FILL CUR req.body', req.body)
 
   var token_data = jwt.decode(req.headers.auth, config.secret, false, 'HS256')
   var filter = {'email':token_data.email};
   
-  var update_fields = null
-  var get_fields = {'diary': 1};
+  var get_fields = {
+    'history': 1,
+    'variables': 1
+  };
+
+  console.log("req.body.count", req.body.count)
+  if(!!!req.body.count) {
+    res.send({
+      message: "Укажите количество записей. Данные не обновлены",
+      code: -1,
+      time: Date.now()
+    });
+  }
 
   db
     .get(db.users_database, db.users_collection, filter, get_fields)
     .then((get_results)=>{
-      console.log('FILL CUR get_results', get_results)
+      // console.log('FILL CUR get_results', get_results)
+
+      let history = unwrap(get_results[0]['history'])
+      let variables = unwrap(get_results[0]['variables'])
+      // console.log('FILL CUR history', modified_history)
+      // console.log('variables', variables)
+
+      let hist_keys_list = Object.keys(history)
+
+      // Чистим history от ключей, что нет в variables
+      for(let hist_key in hist_keys_list) { 
+        if(Object.keys(variables).indexOf(hist_keys_list[hist_key]) == -1)
+          delete history[hist_keys_list[hist_key]]
+      }
+          
+      // Добавляем в историю значения в пределах лимитов из variable
+      hist_keys_list = Object.keys(history)
+      // console.log('hist_keys_list', hist_keys_list)
+      for(let i=0; i < req.body.count; i++) {
+        let new_time = Date.now()
+        for(let hist_key in hist_keys_list) {
+          
+          // Достаём данные о переменной истории
+          let variable = variables[hist_keys_list[hist_key]]
+          let limit_min = Number(variable.limit_min)
+          let limit_max = Number(variable.limit_max)
+
+           // Находим её диапазон значений (макс - мин)
+          let var_limit_sum = limit_max -limit_min
+
+          // Генерируем случайное значение в этом диапазоне
+          let new_hist_val = Number(Math.random() * var_limit_sum + limit_min).toFixed(2)
+
+          console.log('variable', variable)
+          console.log('var_limit_sum', var_limit_sum)
+          console.log('new_hist_val', new_hist_val)
+          history[hist_keys_list[hist_key]][new_time] = {
+            value: new_hist_val,
+            time: new_time
+          }
+        }
+      }
       
-      // db
-      //   .update(db.users_database, db.users_collection, filter, update_fields)
-      //   .then((results)=>{
-      //     if (!!results){
-      //       res.send({
-      //         message: "Данные обновлены",
-      //         code: 0,
-      //         time: new Date.now()
-      //       });
-      //     } else {
-      //       const err = new Error('Данные не обновлены!');
-      //       err.status = 400;
-      //       next(err);
-      //     }
-      //   })
-      //   .catch((err)=>{ next(err); })
+      // Обновляем данные в БД
+      let new_history = { history: wrap(history, Date.now()) }
+      db
+        .update(db.users_database, db.users_collection, filter, new_history)
+        .then((results)=>{
+          if (!!results){
+            res.send({
+              message: "Данные обновлены",
+              code: 0,
+              time: Date.now()
+            });
+          } else {
+            const err = new Error('Данные не обновлены!');
+            err.status = 400;
+            next(err);
+          }
+        })
+        .catch((err)=>{ next(err); })
+
+      // res.send(new_history)
+      // res.send({
+      //   'history': wrap(history, Date.now()), 
+      //   'variables': variables
+      // })
     })
     .catch((err)=>{
       next(err);
