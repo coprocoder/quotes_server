@@ -14,10 +14,10 @@ const { val_key, time_key, wrap, unwrap } = require('../public/javascripts/wrapp
 /* ### === Authorization block === */
 
 router.post('/login', (req, res, next)=>{
-  /* Login = Autorization
-    Fields:
-        -email
-        -password
+  /* Authorization
+    req.body:
+      email: <str>,
+      password: <str>
   */
   console.log('login req.body', req.body)
   var filter = {["email."+val_key]: req.body.email};
@@ -90,10 +90,10 @@ router.post('/logout', (req, res, next)=>{
 });
 
 router.post('/signup', (req, res, next)=>{
-  /* SignUp = Registration
-    Fields:
-      -password
-      -email
+  /* Registration
+    req.body:
+      email: <str>,
+      password: <str>
   */
 
   console.log('signup req.body', req.body)
