@@ -2,20 +2,24 @@ const express = require('express');
 const router = express.Router();
 const db = require('../db/db');
 
-const jwt = require('jwt-simple');
-const config = require('../config/config');
-
 router.post('/find_med', (req, res, next)=>{
   /*
-    req.body ex: {
-      "field_name":<value>,
+    req.body {
+      "field_path1":<value1>,
+      "field_path2":<value2>,
     }
+    ex: { 'locale.ru': 'нурофен' }
   */
 
   console.log('find_med GET CUR req.body', req.body)
 
-  //var filter = {'email.value': req.session.user.email};
-  var filter = {[Object.keys(req.body)[0]]: {$regex: Object.values(req.body)[0]}};
+  // var filter = {[Object.keys(req.body)[0]]: {$regex: Object.values(req.body)[0]}};
+  var filter = {};
+  let req_keys = Object.keys(req.body)
+  let req_values = Object.values(req.body)
+  for(let i in req_keys) { 
+    filter[req_keys[i]] = {$regex: req_values[i]}
+  }
   var fields = {}
 
   db
@@ -38,18 +42,24 @@ router.post('/find_med', (req, res, next)=>{
 
 router.post('/find_diary', (req, res, next)=>{
   /*
-    req.body ex: {
-      "field_name":<value>,
+    req.body {
+      "field_path":<value>,
     }
   */
 
   console.log('find_diary GET CUR req.body', req.body)
 
-  //var filter = {'email.value': req.session.user.email};
-  var filter = {
-    [Object.keys(req.body)[0]]: typeof(Object.values(req.body)[0]) == "string" ? 
-                                  {$regex: Object.values(req.body)[0]} : 
-                                  Object.values(req.body)[0]};
+  // var filter = {
+  //   [Object.keys(req.body)[0]]: typeof(Object.values(req.body)[0]) == "string" ? 
+  //                                 {$regex: Object.values(req.body)[0]} : 
+  //                                 Object.values(req.body)[0]};
+  var filter = {};
+  let req_keys = Object.keys(req.body)
+  let req_values = Object.values(req.body)
+  for(let i in req_keys) { 
+    filter[req_keys[i]] = typeof(req_values[i]) == "string" ?  {$regex: req_values[i]} : req_values[i];
+  }
+
   var fields = {}
 
   db
@@ -72,18 +82,23 @@ router.post('/find_diary', (req, res, next)=>{
 
 router.post('/find_var', (req, res, next)=>{
   /*
-    req.body ex: {
-      "field_name":<value>,
+    req.body {
+      "field_path":<value>,
     }
   */
 
   console.log('find_var GET CUR req.body', req.body)
 
-  //var filter = {'email.value': req.session.user.email};
-  var filter = {
-    [Object.keys(req.body)[0]]: typeof(Object.values(req.body)[0]) == "string" ? 
-                                  {$regex: Object.values(req.body)[0]} : 
-                                  Object.values(req.body)[0]};
+  // var filter = {
+  //   [Object.keys(req.body)[0]]: typeof(Object.values(req.body)[0]) == "string" ? 
+  //                                 {$regex: Object.values(req.body)[0]} : 
+  //                                 Object.values(req.body)[0]};
+  var filter = {};
+  let req_keys = Object.keys(req.body)
+  let req_values = Object.values(req.body)
+  for(let i in req_keys) { 
+    filter[req_keys[i]] = typeof(req_values[i]) == "string" ?  {$regex: req_values[i]} : req_values[i];
+  }
   var fields = {}
 
   db

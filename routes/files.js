@@ -86,6 +86,7 @@ router.post('/upload_img', uploadImg.array('file'), async (req, res) => {
         resize_abs_path
       )
   }
+  // console.log('file size', JSON.stringify(req.files).length)
   return res.status(200).send(req.files)
 })
 
@@ -142,7 +143,6 @@ router.post('/download_files', (req, res, next)=>{
   
   let rel_path = req.body.path    // rel path
   let filePath = path.join(__dirname, '../' + rel_path); // abs path
-  let fileName = path.basename(filePath)
   res.sendFile(filePath)
 
   // res.download(filePath, fileName, (err) => {

@@ -82,7 +82,6 @@ router.post('/get', (req, res, next)=>{
     })
 })
 
-// Update field by existed user
 router.post('/update', (req, res, next)=>{
   /*
     req.body ex: {

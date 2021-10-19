@@ -70,41 +70,51 @@ router.post('/create', (req, res, next)=>{
 // Delete existed user
 router.post('/delete', (req, res, next)=>{
   console.log('DELETE ANY req.body', req.body)
+  
+  var token_data = jwt.decode(req.headers.auth, config.secret, false, 'HS256')
   var filter = req.body;
   var fields = {};
-  db
-    // Ищем объект для удаления
-    .get(db.users_database, db.users_collection, filter, fields)
-    .then((get_results)=>{
-      console.log('DELETE ANY USER results', get_results)
-      db
-        // Удаляем объекта из обычной БД
-        .delete(db.users_database, db.users_collection, filter)
-        .then((del_user_results)=>{
-          // Ищем в секретной БД связанный с юзером объект и удаляем его
-          var secure_filter = { 'user_id.value': get_results[0]._id}
-          db
-            .delete(db.secure_database, db.secure_collection, secure_filter)
-            .then((del_secure_results)=>{
-              if (!!del_secure_results){
-                res.send(del_secure_results);
-              } else {
-                const err = new Error('Данные не найдены!');
-                err.status = 400;
-                  next(err);
-              }
-            })
-            .catch((err)=>{
-              next(err);
-            })
-        })
-        .catch((err)=>{
-          next(err);
-        })
-    })
-    .catch((err)=>{
+
+  if(!!token_data && token_data.role == 0) {
+    db
+      // Ищем объект для удаления
+      .get(db.users_database, db.users_collection, filter, fields)
+      .then((get_results)=>{
+        console.log('DELETE ANY USER results', get_results)
+        db
+          // Удаляем объекта из обычной БД
+          .delete(db.users_database, db.users_collection, filter)
+          .then((del_user_results)=>{
+            // Ищем в секретной БД связанный с юзером объект и удаляем его
+            var secure_filter = { 'user_id.value': get_results[0]._id}
+            db
+              .delete(db.secure_database, db.secure_collection, secure_filter)
+              .then((del_secure_results)=>{
+                if (!!del_secure_results){
+                  res.send(del_secure_results);
+                } else {
+                  const err = new Error('Данные не найдены!');
+                  err.status = 400;
+                    next(err);
+                }
+              })
+              .catch((err)=>{
+                next(err);
+              })
+          })
+          .catch((err)=>{
+            next(err);
+          })
+      })
+      .catch((err)=>{
+        next(err);
+      })
+  }
+  else {
+    const err = new Error('Нет прав на удаление!');
+    err.status = 403;
       next(err);
-    })
+  }
 })
 
 module.exports = router;
