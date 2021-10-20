@@ -1,8 +1,0 @@
-=== Create template project
-npm install -g express-generator
-express (it generate base project)
-
-=== Deploy
-npm install
-npm uninstall connect-mongo
-npm install connect-mongo@3.2.0 --save

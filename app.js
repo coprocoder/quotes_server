@@ -51,7 +51,7 @@ app.use(function(req, res, next){
 
     let data = `${day}.${month}.${year} ${hour}:${minutes}:${seconds} ${req.method} ${req.url} ${req.get("user-agent")}`;
 
-    fs.appendFile("server.log", data + "\n", function(){});
+    fs.appendFile("requests.log", data + "\n", function(){});
     next();
 });
 
