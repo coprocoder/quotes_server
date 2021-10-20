@@ -26,14 +26,14 @@ router.post('/get', (req, res, next)=>{
 
   //var filter = {'email.value': req.session.user.email};
   var token_data = jwt.decode(req.headers.auth, config.secret, false, 'HS256')
-  console.log('GET CUR token_data', token_data)
+  // console.log('GET CUR token_data', token_data)
   var filter = {'_id': token_data.id};
   var fields = !!req.body.url ? {[req.body.url]: 1} : {}
 
   db
     .get(db.users_database, db.users_collection, filter, fields)
     .then((results)=>{
-      console.log('GET CUR results', results)
+      // console.log('GET CUR results', results)
 
       // Достаём по url нужное вложенное поле из результата
       let results_found_field = results[0]
@@ -44,8 +44,8 @@ router.post('/get', (req, res, next)=>{
         fields = { [req.body.url]: 1};
         if(req.body.url.length > 0){
           urls  = req.body.url.split('.')
-          console.log('GET CUR results_found_field', results_found_field)
-          console.log('GET CUR urls', urls)
+          // console.log('GET CUR results_found_field', results_found_field)
+          // console.log('GET CUR urls', urls)
           for (i in urls){
             if(results_found_field[urls[i]] != undefined)
               results_found_field = results_found_field[urls[i]] 
@@ -116,12 +116,12 @@ router.post('/update', (req, res, next)=>{
   else{
      res.send({code: -1, time: null, message: "Фильтр данных не задан"});
   }
-  console.log('UPDATE CUR update_fields', update_fields)
+  // console.log('UPDATE CUR update_fields', update_fields)
 
   db
     .get(db.users_database, db.users_collection, filter, get_fields)
     .then((get_results)=>{
-      console.log('UPDATE CUR get_results', get_results)
+      // console.log('UPDATE CUR get_results', get_results)
       
       // Достаём нужное поле по URL
       let urls = req.body.url.split('.')
@@ -132,7 +132,7 @@ router.post('/update', (req, res, next)=>{
               get_result_field = get_result_field[urls[i]]
             }
           }
-      console.log('UPDATE CUR get_result_field', get_result_field)
+      // console.log('UPDATE CUR get_result_field', get_result_field)
     
       // Если поле найдено, то обновляем его
       if(!!get_result_field) { // length > 1 т.к. при GET несуществующего объекта возвращается метаобъект с полем ID
@@ -231,7 +231,7 @@ router.post('/fill_diary', (req, res, next)=>{
     'variables': 1
   };
 
-  console.log("req.body.count", req.body.count)
+  // console.log("req.body.count", req.body.count)
   if(!!!req.body.count) {
     res.send({
       message: "Укажите количество записей. Данные не обновлены",
@@ -276,9 +276,9 @@ router.post('/fill_diary', (req, res, next)=>{
           // Генерируем случайное значение в этом диапазоне
           let new_hist_val = Number(Math.random() * var_limit_sum + limit_min).toFixed(2)
 
-          console.log('variable', variable)
-          console.log('var_limit_sum', var_limit_sum)
-          console.log('new_hist_val', new_hist_val)
+          // console.log('variable', variable)
+          // console.log('var_limit_sum', var_limit_sum)
+          // console.log('new_hist_val', new_hist_val)
           history[hist_keys_list[hist_key]][new_time] = {
             value: new_hist_val,
             time: new_time
