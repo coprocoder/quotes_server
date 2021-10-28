@@ -1,4 +1,4 @@
 {
   "secret" : "super_secret_word",
-  "db" : "mongodb://localhost:27017"
+  "db" : "mongodb+srv://coprocoder:1@med.gcalr.mongodb.net"
 }
