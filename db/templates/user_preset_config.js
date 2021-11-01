@@ -52,7 +52,7 @@ module.exports = user_preset_config = {
                     "key": "1"
                 }
             ],
-            "chartAgg": 0,
+            "aggChart": 0,
             "title": "Сатурация",
             "wide": false,
             "period": 0,
@@ -345,6 +345,15 @@ module.exports = user_preset_config = {
             "locale": {
                 "ru": "Сахар"
             }
-        }
+        },
+        "1634114472907": {
+            "icon": "faHamburger",
+            "color": 2,
+            "limit_min": "40",
+            "limit_max": "240",
+            "locale": {
+                "ru": "ЧСС"
+            }
+        },
     }  
 };

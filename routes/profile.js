@@ -218,6 +218,7 @@ router.post('/fill_diary', (req, res, next)=>{
   /*
     req.body: {
       count: <Int number> // Количество сгенерированных записей для добавления
+      interval: <miliseconds>
     }
   */
  
@@ -260,9 +261,9 @@ router.post('/fill_diary', (req, res, next)=>{
           
       // Добавляем в историю значения в пределах лимитов из variable
       hist_keys_list = Object.keys(history)
-      // console.log('hist_keys_list', hist_keys_list)
+      let new_time = Date.now()
       for(let i=0; i < req.body.count; i++) {
-        let new_time = Date.now()
+        new_time += (req.body.interval * i) 
         for(let hist_key in hist_keys_list) {
           
           // Достаём данные о переменной истории

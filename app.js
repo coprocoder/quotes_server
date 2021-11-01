@@ -5,6 +5,7 @@ const path = require('path');
 const fs = require('fs');
 const cookieParser = require('cookie-parser');
 const logger = require('morgan');
+const cons = require('consolidate');
 const mimetypes = require("./config/mimetypes.js")
 const config = require('./config/config.json')
 
@@ -26,6 +27,11 @@ const messagingRouter = require('./routes/firebase/messaging');
 var app = express();
 app.use(cors());
 app.options('*', cors());
+
+//### view engine setup
+app.engine('html', cons.swig)
+app.set('views', path.join(__dirname, 'views'));
+app.set('view engine', 'html');
 
 app.use(logger('dev'));
 
