@@ -238,15 +238,6 @@ module.exports = user_preset_config = {
         }
     },
     "variables": {
-        "1630995763300": {
-            "icon": "faHamburger",
-            "color": 2,
-            "limit_min": "40",
-            "limit_max": "240",
-            "locale": {
-                "ru": "ЧСС"
-            }
-        },
         "1630995796983": {
             "icon": "faHamburger",
             "color": 6,
