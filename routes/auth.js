@@ -118,7 +118,7 @@ router.post('/signup', (req, res, next)=>{
         data['email'] = wrap(req.body.email, servertime)
         data['username'] = wrap(req.body.username, servertime)
         data['diary'] = wrap(user_preset_config.diary, servertime)
-        data['history'] = wrap(Object.assign({}, ...Object.keys(user_preset_config.diary).map(x => ({[x]: {} }))), servertime)
+        data['history'] = wrap(Object.assign({}, ...Object.keys(user_preset_config.variables).map(x => ({[x]: {} }))), servertime)
         data['variables'] = wrap(Object.assign({}, ...Object.keys(user_preset_config.variables).map(x => ({[x]: user_preset_config.variables[x] }))), servertime)
 
         // Записываем данные в обычную БД
@@ -150,7 +150,7 @@ router.post('/signup', (req, res, next)=>{
               .create(db.secure_database,db.secure_collection, secure_data)
               .then((results)=>{
                 res.json({
-                  user_id: new_user._id,
+                  // user_id: new_user._id,
                   token: token
                 })
               })

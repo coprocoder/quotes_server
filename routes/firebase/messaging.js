@@ -112,9 +112,9 @@ router.post('/register_token', (req, res, next) => {
     }
   */
 
-  console.log('register_token req', req)
-  console.log('register_token req.body', req.body)
-  console.log('register_token req.headers.auth', req.headers.auth)
+  // console.log('register_token req', req)
+  // console.log('register_token req.body', req.body)
+  // console.log('register_token req.headers.auth', req.headers.auth)
 
   var token_data = jwt.decode(req.headers.auth, config.secret, false, 'HS256')
   console.log('register_token token_data', token_data)

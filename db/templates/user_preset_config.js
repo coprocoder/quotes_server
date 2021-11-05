@@ -292,15 +292,6 @@ module.exports = user_preset_config = {
                 "ru": "Диастолическое"
             }
         },
-        "1630996041650": {
-            "icon": "faHamburger",
-            "color": 0,
-            "limit_min": "0",
-            "limit_max": "10000",
-            "locale": {
-                "ru": "Активность"
-            }
-        },
         "1630996055866": {
             "icon": "faHamburger",
             "color": 0,
@@ -308,6 +299,24 @@ module.exports = user_preset_config = {
             "limit_max": "10000",
             "locale": {
                 "ru": "Шаги"
+            }
+        },
+        "1630996199466": {
+            "icon": "faHamburger",
+            "color": 0,
+            "limit_min": "2",
+            "limit_max": "6",
+            "locale": {
+                "ru": "Сахар"
+            }
+        },
+        "1634114472907": {
+            "icon": "faHamburger",
+            "color": 2,
+            "limit_min": "40",
+            "limit_max": "240",
+            "locale": {
+                "ru": "ЧСС"
             }
         },
         "1630996090449": {
@@ -328,22 +337,13 @@ module.exports = user_preset_config = {
                 "ru": "Вывод_воды"
             }
         },
-        "1630996199466": {
+        "1630996041650": {
             "icon": "faHamburger",
             "color": 0,
-            "limit_min": "2",
-            "limit_max": "6",
+            "limit_min": "0",
+            "limit_max": "10000",
             "locale": {
-                "ru": "Сахар"
-            }
-        },
-        "1634114472907": {
-            "icon": "faHamburger",
-            "color": 2,
-            "limit_min": "40",
-            "limit_max": "240",
-            "locale": {
-                "ru": "ЧСС"
+                "ru": "Активность"
             }
         },
     }  
