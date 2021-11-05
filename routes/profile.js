@@ -222,9 +222,10 @@ router.post('/remove', (req, res, next) => {
 
   console.log('REMOVE CUR req.body', req.body)
 
-  var token_data = jwt.decode(req.headers.auth, config.secret, false, 'HS256')
+  let token_data = jwt.decode(req.headers.auth, config.secret, false, 'HS256')
 
-  var filter = { 'email': token_data.email };
+  let filter = { 'email': token_data.email };
+  let remove_fields = { [req.body.url]: "" }
 
   // Преобразовываем входные данные в данные для NoSQL запроса
   if (!!req.body.url) {
@@ -253,7 +254,7 @@ router.post('/remove', (req, res, next) => {
       // Если поле найдено, то обновляем его
       if (!!get_result_field) {
         db
-          .remove(db.users_database, db.users_collection, filter, update_fields)
+          .remove(db.users_database, db.users_collection, filter, remove_fields)
           .then((results) => {
             if (!!results) {
               res.send({
@@ -290,7 +291,7 @@ router.post('/fill_diary', (req, res, next) => {
     }
   */
 
-  // console.log('FILL CUR req.body', req.body)
+  console.log('FILL CUR req.body', req.body)
 
   var token_data = jwt.decode(req.headers.auth, config.secret, false, 'HS256')
   var filter = { 'email': token_data.email };
@@ -300,11 +301,16 @@ router.post('/fill_diary', (req, res, next) => {
     'variables': 1
   };
 
-  // console.log("req.body.count", req.body.count)
   if (!!!req.body.count) {
     res.send({
-      message: "Укажите количество записей. Данные не обновлены",
+      message: "Данные не обновлены. Укажите количество записей.",
       code: -1,
+      time: Date.now()
+    });
+  } else if (!!!req.body.interval) {
+    res.send({
+      message: "Данные не обновлены. Укажите интервал записей.",
+      code: -2,
       time: Date.now()
     });
   }
@@ -316,22 +322,24 @@ router.post('/fill_diary', (req, res, next) => {
 
       let history = unwrap(get_results[0]['history'])
       let variables = unwrap(get_results[0]['variables'])
-      // console.log('FILL CUR history', modified_history)
-      // console.log('variables', variables)
 
       let hist_keys_list = Object.keys(history)
 
       // Чистим history от ключей, что нет в variables
-      for (let hist_key in hist_keys_list) {
-        if (Object.keys(variables).indexOf(hist_keys_list[hist_key]) == -1)
-          delete history[hist_keys_list[hist_key]]
-      }
+      // for (let hist_key in hist_keys_list) {
+      //   if (Object.keys(variables).indexOf(hist_keys_list[hist_key]) == -1)
+      //     delete history[hist_keys_list[hist_key]]
+      // }
+      
+      console.log('FILL CUR history', history)
+      console.log('FILL CUR variables', variables)
 
       // Добавляем в историю значения в пределах лимитов из variable
       hist_keys_list = Object.keys(history)
       let new_time = Date.now()
-      for (let i = 0; i < req.body.count; i++) {
-        new_time += (req.body.interval * i)
+      for (let i = 1; i < req.body.count + 1; i++) {
+        new_time -= req.body.interval
+        console.log('FILL CUR new_time', new_time)
         for (let hist_key in hist_keys_list) {
 
           // Достаём данные о переменной истории
@@ -345,15 +353,16 @@ router.post('/fill_diary', (req, res, next) => {
           // Генерируем случайное значение в этом диапазоне
           let new_hist_val = Number(Math.random() * var_limit_sum + limit_min).toFixed(2)
 
-          // console.log('variable', variable)
+          console.log('variable', variable)
           // console.log('var_limit_sum', var_limit_sum)
-          // console.log('new_hist_val', new_hist_val)
+          console.log('new_hist_val', new_hist_val)
           history[hist_keys_list[hist_key]][new_time] = {
-            value: new_hist_val,
+            value: Number(new_hist_val),
             time: new_time
           }
         }
       }
+      console.log('FILL CUR new history', history)
 
       // Обновляем данные в БД
       let new_history = { history: wrap(history, Date.now()) }
