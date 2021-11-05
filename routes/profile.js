@@ -376,7 +376,7 @@ router.post('/fill_diary', (req, res, next) => {
               time: Date.now()
             });
           } else {
-            const err = new Error('Данные не обновлены!');
+            const err = new Error('Данные не обновлены! Попробуйте ещё раз позже.');
             err.status = 400;
             next(err);
           }
