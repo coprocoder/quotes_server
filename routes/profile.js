@@ -351,7 +351,7 @@ router.post('/fill_diary', (req, res, next) => {
           let var_limit_sum = limit_max - limit_min
 
           // Генерируем случайное значение в этом диапазоне
-          let new_hist_val = Number(Math.random() * var_limit_sum + limit_min).toFixed(2)
+          let new_hist_val = Number(Math.random() * var_limit_sum + limit_min).toFixed(0)
 
           console.log('variable', variable)
           // console.log('var_limit_sum', var_limit_sum)
