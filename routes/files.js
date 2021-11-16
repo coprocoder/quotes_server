@@ -8,6 +8,7 @@ const path = require('path')
 const sharp = require('sharp')
 const { promisify } = require('util');
 const sizeOf = promisify(require('image-size'))
+const transliterate = require('../config/translit')
 
 /* === FILES === */
 
@@ -16,7 +17,7 @@ var storage_img = multer.diskStorage({
     cb(null, 'uploadStorage/images/full')
   },
   filename: function (req, file, cb) {
-    cb(null, Date.now() + '-' +file.originalname )
+    cb(null, Date.now() + '-' + transliterate(file.originalname))
   }
 })
 var storage_files = multer.diskStorage({
@@ -24,7 +25,7 @@ var storage_files = multer.diskStorage({
     cb(null, 'uploadStorage/files')
   },
   filename: function (req, file, cb) {
-    cb(null, Date.now() + '-' +file.originalname )
+    cb(null, Date.now() + '-' + transliterate(file.originalname))
   }
 })
 var uploadImg = multer({ storage: storage_img })
