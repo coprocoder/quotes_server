@@ -29,7 +29,8 @@ module.exports = user_preset_config = {
             "title": "ЧСС",
             "wide": false,
             "period": 2,
-            "icon": "freq"
+            "icon": "freq",
+            "unit": "уд./мин."
         },
         "1634114605842": {
             "backgroundColor": 1,
@@ -56,7 +57,8 @@ module.exports = user_preset_config = {
             "title": "Сатурация",
             "wide": false,
             "period": 0,
-            "icon": "saturation"
+            "icon": "saturation",
+            "unit": "%"
         },
         "1634114663398": {
             "backgroundColor": 2,
@@ -88,7 +90,8 @@ module.exports = user_preset_config = {
             "title": "Давление",
             "wide": true,
             "period": 0,
-            "icon": "pressure"
+            "icon": "pressure",
+            "unit": "мм. рт. ст."
         },
         "1634114806981": {
             "backgroundColor": 3,
@@ -114,7 +117,8 @@ module.exports = user_preset_config = {
             "title": "Шаги",
             "wide": false,
             "period": 0,
-            "icon": "steps"
+            "icon": "steps",
+            "unit": "ед."
         },
         "1634115281395": {
             "backgroundColor": 4,
@@ -135,7 +139,8 @@ module.exports = user_preset_config = {
             "title": "Температура",
             "wide": false,
             "period": 0,
-            "icon": "temperature"
+            "icon": "temperature",
+            "unit": "°C"
         },
         "1634115353627": {
             "backgroundColor": 5,
@@ -156,7 +161,8 @@ module.exports = user_preset_config = {
             "title": "Сахар",
             "wide": false,
             "period": 1,
-            "icon": "glu"
+            "icon": "glu",
+            "unit": "ммоль/л"
         },
         "1634115451059": {
             "backgroundColor": 6,
@@ -177,7 +183,8 @@ module.exports = user_preset_config = {
             "title": "Вес",
             "wide": false,
             "period": 2,
-            "icon": "weight"
+            "icon": "weight",
+            "unit": "кг"
         },
         "1634115471433": {
             "backgroundColor": 7,
@@ -198,7 +205,8 @@ module.exports = user_preset_config = {
             "title": "Рост",
             "wide": false,
             "period": 2,
-            "icon": "height"
+            "icon": "height",
+            "unit": "см"
         },
         "1634115521251": {
             "backgroundColor": 8,
@@ -234,7 +242,8 @@ module.exports = user_preset_config = {
             "title": "ИМТ",
             "wide": false,
             "period": 2,
-            "icon": "bmi"
+            "icon": "bmi",
+            "unit": "кг/м²"
         }
     },
     "variables": {

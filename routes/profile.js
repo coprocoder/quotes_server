@@ -337,8 +337,8 @@ router.post('/fill_diary', (req, res, next) => {
       // Добавляем в историю значения в пределах лимитов из variable
       hist_keys_list = Object.keys(history)
       let new_time = Date.now()
-      for (let i = 1; i < req.body.count + 1; i++) {
-        new_time -= req.body.interval
+      for (let i = 1; i < Number(req.body.count) + 1; i++) {
+        new_time -= Number(req.body.interval)
         console.log('FILL CUR new_time', new_time)
         for (let hist_key in hist_keys_list) {
 
@@ -373,6 +373,7 @@ router.post('/fill_diary', (req, res, next) => {
             res.send({
               message: "Данные обновлены",
               code: 0,
+              items: new_history,
               time: Date.now()
             });
           } else {
