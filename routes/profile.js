@@ -336,9 +336,14 @@ router.post('/fill_diary', (req, res, next) => {
 
       // Добавляем в историю значения в пределах лимитов из variable
       hist_keys_list = Object.keys(history)
+      let history_addictions = {}
+      for (let hist_key in hist_keys_list) {
+        history_addictions[hist_keys_list[hist_key]] = {}
+      }
+
       let new_time = Date.now()
-      for (let i = 1; i < req.body.count + 1; i++) {
-        new_time -= req.body.interval
+      for (let i = 1; i < Number(req.body.count) + 1; i++) {
+        new_time -= Number(req.body.interval)
         console.log('FILL CUR new_time', new_time)
         for (let hist_key in hist_keys_list) {
 
@@ -356,7 +361,7 @@ router.post('/fill_diary', (req, res, next) => {
           console.log('variable', variable)
           // console.log('var_limit_sum', var_limit_sum)
           console.log('new_hist_val', new_hist_val)
-          history[hist_keys_list[hist_key]][new_time] = {
+          history_addictions[hist_keys_list[hist_key]][new_time] = {
             value: Number(new_hist_val),
             time: new_time
           }
@@ -364,30 +369,28 @@ router.post('/fill_diary', (req, res, next) => {
       }
       console.log('FILL CUR new history', history)
 
-      // Обновляем данные в БД
-      let new_history = { history: wrap(history, Date.now()) }
-      db
-        .update(db.users_database, db.users_collection, filter, new_history)
-        .then((results) => {
-          if (!!results) {
-            res.send({
-              message: "Данные обновлены",
-              code: 0,
-              time: Date.now()
-            });
-          } else {
-            const err = new Error('Данные не обновлены! Попробуйте ещё раз позже.');
-            err.status = 400;
-            next(err);
-          }
-        })
-        .catch((err) => { next(err); })
+      res.send({
+        items: history_addictions,
+        time: Date.now()
+      });
 
-      // res.send(new_history)
-      // res.send({
-      //   'history': wrap(history, Date.now()), 
-      //   'variables': variables
-      // })
+      // // Обновляем данные в БД
+      // let new_history = { history: wrap(history_addictions, Date.now()) }
+      // db
+      //   .update(db.users_database, db.users_collection, filter, new_history)
+      //   .then((results) => {
+      //     if (!!results) {
+      //       res.send({
+      //         message: "Данные обновлены",
+      //         time: Date.now()
+      //       });
+      //     } else {
+      //       const err = new Error('Данные не обновлены! Попробуйте ещё раз позже.');
+      //       err.status = 400;
+      //       next(err);
+      //     }
+      //   })
+      //   .catch((err) => { next(err); })
     })
     .catch((err) => {
       next(err);
