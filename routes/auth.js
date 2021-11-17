@@ -57,6 +57,7 @@ router.post('/login', (req, res, next)=>{
               
               res.json({
                 token: token, 
+                username: unwrap(user_results[0].username),
                 //user: payload
               });
             }
@@ -93,7 +94,8 @@ router.post('/signup', (req, res, next)=>{
   /* Registration
     req.body:
       email: <str>,
-      password: <str>
+      password: <str>,
+      username: <str>,
   */
 
   console.log('signup req.body', req.body)
