@@ -23,7 +23,7 @@ router.post('/find', (req, res, next)=>{
       filter_fields.push({ [target_path_list[field]]: {$regex: target_words[word]}})
     query_fields.push({ $or: filter_fields })
   }
-  console.log('find user GET CUR query_fields', query_fields)
+  // console.log('find user GET CUR query_fields', query_fields)
 
   var filter = { $and: query_fields };
   var fields = {
@@ -32,13 +32,13 @@ router.post('/find', (req, res, next)=>{
     personal: 1
   }
 
-  console.log('find user GET CUR filter', filter)
+  // console.log('find user GET CUR filter', filter)
   // res.send(filter);
 
   db
     .get(db.users_database, db.users_collection, filter, fields)
     .then((results)=>{
-      console.log('find user GET CUR results', results)
+      // console.log('find user GET CUR results', results)
       // console.log('unwrap', unwrap(results[0]))
       if(results.length)
         res.send(results.map(item => unwrap({
@@ -80,7 +80,7 @@ router.post('/delete', (req, res, next)=>{
       // Ищем объект для удаления
       .get(db.users_database, db.users_collection, filter, fields)
       .then((get_results)=>{
-        console.log('DELETE ANY USER results', get_results)
+        // console.log('DELETE ANY USER results', get_results)
         db
           // Удаляем объекта из обычной БД
           .delete(db.users_database, db.users_collection, filter)

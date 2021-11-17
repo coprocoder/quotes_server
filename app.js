@@ -56,9 +56,6 @@ app.use(function(req, res, next){
     let seconds = now.getSeconds();
 
     let data = `${day}.${month}.${year} ${hour}:${minutes}:${seconds} ${req.method} ${res.statusCode} ${req.url} ${req.get("user-agent")}`;
-
-    // console.log('==== res', res.statusCode)
-
     fs.appendFile("requests.log", data + "\n", function(){});
     next();
 });

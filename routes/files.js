@@ -29,6 +29,7 @@ var storage_files = multer.diskStorage({
   }
 })
 var uploadImg = multer({ storage: storage_img })
+
 var uploadFiles = multer({ storage: storage_files })
 
 router.post('/upload_img', uploadImg.array('file'), async (req, res) => {
@@ -52,7 +53,7 @@ router.post('/upload_img', uploadImg.array('file'), async (req, res) => {
     }
   */
 
-  console.log('multer files', req.files)
+  // console.log('multer files', req.files)
 
   for(let i in req.files) {
     let file = req.files[i]
@@ -92,7 +93,6 @@ router.post('/upload_img', uploadImg.array('file'), async (req, res) => {
 })
 
 router.post('/upload_files', uploadFiles.array('file'), async (req, res) => {
-  console.log('multer files', req.files)
   return res.status(200).send(req.files)
 })
 
@@ -138,10 +138,7 @@ router.post('/download_img', (req, res, next)=>{
 /* =================
     DEPRECATED (get access by http URL )
    ================= */
-router.post('/download_files', (req, res, next)=>{
-  console.log('download_files req.body', req.body)
-
-  
+router.post('/download_files', (req, res, next)=>{  
   let rel_path = req.body.path    // rel path
   let filePath = path.join(__dirname, '../' + rel_path); // abs path
   res.sendFile(filePath)

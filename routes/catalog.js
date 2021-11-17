@@ -65,7 +65,7 @@ router.post('/find_diary', (req, res, next)=>{
   db
     .get(db.catalog_database, db.catalog_collection_diary, filter, fields)
     .then((results)=>{
-      console.log('find_diary GET CUR results', results)
+      // console.log('find_diary GET CUR results', results)
       if(results.length)
         res.send(results);
       else
@@ -104,7 +104,7 @@ router.post('/find_var', (req, res, next)=>{
   db
     .get(db.catalog_database, db.catalog_collection_variable, filter, fields)
     .then((results)=>{
-      console.log('find_var GET CUR results', results)
+      // console.log('find_var GET CUR results', results)
       if(results.length)
         res.send(results);
       else

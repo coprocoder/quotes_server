@@ -21,8 +21,8 @@ router.post('/get', (req, res, next) => {
   */
 
   //console.log('GET req.session', req.session)
-  console.log('GET CUR req.head.auth', req.headers.auth)
-  console.log('GET CUR req.body', req.body)
+  // console.log('GET CUR req.head.auth', req.headers.auth)
+  // console.log('GET CUR req.body', req.body)
 
   //var filter = {'email.value': req.session.user.email};
   var token_data = jwt.decode(req.headers.auth, config.secret, false, 'HS256')
@@ -57,14 +57,14 @@ router.post('/get', (req, res, next) => {
           }
         }
       }
-      console.log('GET CUR ans', results_found_field)
+      // console.log('GET CUR ans', results_found_field)
 
       // Если поле найдено и данные являются актуальными, то возвращаем
       if (!!results_found_field) {
         if (req.body.time < results_found_field[time_key] || req.body.time == null) {
-          console.log('=== results_found_field ===', req.body.time, results_found_field[time_key])
+          // console.log('=== results_found_field ===', req.body.time, results_found_field[time_key])
           for (key in results_found_field)
-            console.log('field founded: ' + key)
+            // console.log('field founded: ' + key)
           res.send(results_found_field);
         }
         else {
@@ -238,7 +238,7 @@ router.post('/remove', (req, res, next) => {
   db
     .get(db.users_database, db.users_collection, filter, get_fields)
     .then((get_results) => {
-      console.log('REMOVE CUR get_results', get_results)
+      // console.log('REMOVE CUR get_results', get_results)
 
       // Достаём нужное поле по URL
       let urls = req.body.url.split('.')
@@ -249,7 +249,7 @@ router.post('/remove', (req, res, next) => {
             get_result_field = get_result_field[urls[i]]
           }
         }
-      console.log('REMOVE CUR get_result_field', get_result_field)
+      // console.log('REMOVE CUR get_result_field', get_result_field)
 
       // Если поле найдено, то обновляем его
       if (!!get_result_field) {
@@ -331,8 +331,8 @@ router.post('/fill_diary', (req, res, next) => {
       //     delete history[hist_keys_list[hist_key]]
       // }
       
-      console.log('FILL CUR history', history)
-      console.log('FILL CUR variables', variables)
+      // console.log('FILL CUR history', history)
+      // console.log('FILL CUR variables', variables)
 
       // Добавляем в историю значения в пределах лимитов из variable
       hist_keys_list = Object.keys(history)
@@ -344,7 +344,7 @@ router.post('/fill_diary', (req, res, next) => {
       let new_time = Date.now()
       for (let i = 1; i < Number(req.body.count) + 1; i++) {
         new_time -= Number(req.body.interval)
-        console.log('FILL CUR new_time', new_time)
+        // console.log('FILL CUR new_time', new_time)
         for (let hist_key in hist_keys_list) {
 
           // Достаём данные о переменной истории
@@ -358,16 +358,16 @@ router.post('/fill_diary', (req, res, next) => {
           // Генерируем случайное значение в этом диапазоне
           let new_hist_val = Number(Math.random() * var_limit_sum + limit_min).toFixed(0)
 
-          console.log('variable', variable)
+          // console.log('variable', variable)
           // console.log('var_limit_sum', var_limit_sum)
-          console.log('new_hist_val', new_hist_val)
+          // console.log('new_hist_val', new_hist_val)
           history_addictions[hist_keys_list[hist_key]][new_time] = {
             value: Number(new_hist_val),
             time: new_time
           }
         }
       }
-      console.log('FILL CUR new history', history)
+      // console.log('FILL CUR new history', history)
 
       res.send({
         items: history_addictions,
