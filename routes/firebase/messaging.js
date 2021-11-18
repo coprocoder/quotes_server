@@ -28,13 +28,14 @@ router.post('/send', async (req, res) => {
   console.log('firebase_send body', req.body)
 
   // var user_token_data = jwt.decode(req.headers.auth, config.secret, false, 'HS256')
-  // console.log('firebase send user_token', user_token_data)
+  console.log('firebase send user_token', user_token_data)
 
   var filter_user = { 'email._V': 'test' };
   let get_secure_fields = { ['fb_token']: 1 };
   let get_user_fields = { 'email': 1 };
-  // console.log('firebase_send get_user_fields', get_user_fields)
-  // console.log('firebase_send get_secure_fields', get_secure_fields)
+
+  console.log('firebase_send get_user_fields', get_user_fields)
+  console.log('firebase_send get_secure_fields', get_secure_fields)
 
   // Ищем юзера с email из jwt_token
   db
@@ -93,7 +94,7 @@ router.post('/send', async (req, res) => {
           registrationTokens.forEach(i => {
             messaging.send({ ...message, token: i })
           })
-          // console.log('firebase send message', message)\
+          console.log('firebase send message', message)
 
           return res.send({}).status(200)
         })
@@ -112,12 +113,12 @@ router.post('/register_token', (req, res, next) => {
     }
   */
 
-  // console.log('register_token req', req)
-  // console.log('register_token req.body', req.body)
-  // console.log('register_token req.headers.auth', req.headers.auth)
+  console.log('firebase register_token req', req)
+  console.log('firebase register_token req.body', req.body)
+  console.log('firebase register_token req.headers.auth', req.headers.auth)
 
   var token_data = jwt.decode(req.headers.auth, config.secret, false, 'HS256')
-  console.log('register_token token_data', token_data)
+  console.log('firebase register_token token_data', token_data)
 
   var filter = { 'email': token_data.email };
 
@@ -125,14 +126,14 @@ router.post('/register_token', (req, res, next) => {
   let get_secure_fields = { ['fb_token']: 1 };
   let get_user_fields = { [token_data.email._V]: 1 };
 
-  console.log('register_token get_user_fields', get_user_fields)
-  console.log('register_token get_secure_fields', get_secure_fields)
+  console.log('firebase register_token get_user_fields', get_user_fields)
+  console.log('firebase register_token get_secure_fields', get_secure_fields)
 
   // Ищем юзера с email из jwt_token
   db
     .get(db.users_database, db.users_collection, filter, get_user_fields)
     .then((get_users_results) => {
-      console.log('register_token get_users_results', get_users_results)
+      console.log('firebase register_token get_users_results', get_users_results)
 
       var filter_secure = { 'user_id': get_users_results[0]._id };
 
@@ -140,11 +141,11 @@ router.post('/register_token', (req, res, next) => {
       db
         .get(db.secure_database, db.secure_collection, filter_secure, get_secure_fields)
         .then((get_secure_results) => {
-          console.log('register_token get_secure_results', get_secure_results)
+          console.log('firebase register_token get_secure_results', get_secure_results)
 
           let client_ip = req.ip.replace(/\./g,':')
           let new_token = { [req.body.device + '-' + client_ip]: req.body.token }
-          console.log('register_token new_token', new_token)
+          console.log('firebase register_token new_token', new_token)
 
           // Достаём нужное поле по URL
           let get_result_field = get_secure_results[0]
@@ -155,7 +156,7 @@ router.post('/register_token', (req, res, next) => {
                 new_token
               )
           };
-          console.log('register_token update_secure_fields', update_secure_fields)
+          console.log('firebase register_token update_secure_fields', update_secure_fields)
 
           // Если поле найдено, то обновляем его
           if (!!get_result_field) { // length > 1 т.к. при GET несуществующего объекта возвращается метаобъект с полем ID
@@ -208,11 +209,11 @@ router.post('/delete_token', (req, res, next) => {
     }
   */
 
-  console.log('delete_token req.body', req.body)
-  console.log('delete_token req.headers.auth', req.headers.auth)
+  console.log('firebase delete_token req.body', req.body)
+  console.log('firebase delete_token req.headers.auth', req.headers.auth)
 
   var token_data = jwt.decode(req.headers.auth, config.secret, false, 'HS256')
-  console.log('delete_token token_data', token_data)
+  console.log('firebase delete_token token_data', token_data)
 
   var filter = { 'email': token_data.email };
 
@@ -220,18 +221,18 @@ router.post('/delete_token', (req, res, next) => {
   let get_secure_fields = { ['fb_token']: 1 };
   let get_user_fields = { [token_data.email._V]: 1 };
 
-  console.log('delete_token get_user_fields', get_user_fields)
-  console.log('delete_token get_secure_fields', get_secure_fields)
+  console.log('firebase delete_token get_user_fields', get_user_fields)
+  console.log('firebase delete_token get_secure_fields', get_secure_fields)
 
   db
     .get(db.users_database, db.users_collection, filter, get_user_fields)
     .then((get_users_results) => {
-      console.log('delete_token get_users_results', get_users_results)
+      console.log('firebase delete_token get_users_results', get_users_results)
 
       var filter_secure = { 'user_id': get_users_results[0]._id };
       var remove_secure_fields = { ['fb_token.' + req.body.device]: 1 }
-      console.log('delete_token filter_secure', filter_secure)
-      console.log('delete_token remove_secure_fields', remove_secure_fields)
+      console.log('firebase delete_token filter_secure', filter_secure)
+      console.log('firebase delete_token remove_secure_fields', remove_secure_fields)
 
       db
         .remove(db.secure_database, db.secure_collection, filter_secure, remove_secure_fields)

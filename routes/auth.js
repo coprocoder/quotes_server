@@ -27,7 +27,7 @@ router.post('/login', (req, res, next)=>{
   db
     .get(db.users_database, db.users_collection, filter, fields)
     .then((user_results)=>{
-      console.log('user_results[0]', user_results[0])
+      // console.log('user_results[0]', user_results[0])
       if(user_results.length > 0) {
         var filter = {["user_id"]: user_results[0]._id};
 
@@ -35,11 +35,11 @@ router.post('/login', (req, res, next)=>{
         db
           .get(db.secure_database, db.secure_collection, filter, fields)
           .then((secure_results)=>{
-            console.log('secure_results[0]', secure_results[0])
+            // console.log('secure_results[0]', secure_results[0])
             if (conversion.isValidPassword(req.body.password, secure_results[0].password)) {
 
               let user = user_results[0]
-              console.log('user', user)
+              // console.log('user', user)
 
               // Данные внутри токена
               let payload ={
@@ -53,10 +53,12 @@ router.post('/login', (req, res, next)=>{
               req.session.user = {id: user._id, email: unwrap(user_results[0].email)}
               req.session.isLogged = true;
               req.session.save()  // Сохранение сессии в БД mongoStore
-              console.log('login req.session', req.session)
+              // console.log('login req.session', req.session)
               
               res.json({
                 token: token, 
+                username: user_results[0].username ? unwrap(user_results[0].username) : null,
+                personal: user_results[0].personal ? unwrap(user_results[0].personal) : null,
                 //user: payload
               });
             }
@@ -82,7 +84,7 @@ router.post('/login', (req, res, next)=>{
 })
 
 router.post('/logout', (req, res, next)=>{
-    console.log('logout req.session BEFORE', req.session)
+    // console.log('logout req.session BEFORE', req.session)
     req.session.isLogged = false;
     if (req.session.user)
 		delete req.session.user;
@@ -93,7 +95,8 @@ router.post('/signup', (req, res, next)=>{
   /* Registration
     req.body:
       email: <str>,
-      password: <str>
+      password: <str>,
+      username: <str>,
   */
 
   console.log('signup req.body', req.body)
@@ -126,7 +129,7 @@ router.post('/signup', (req, res, next)=>{
           .create(db.users_database,db.users_collection, data)
           .then((results)=>{
             var new_user = results.ops[0]
-            console.log('new_user', new_user)
+            // console.log('new_user', new_user)
             
             let payload ={
               id: new_user._id,
@@ -137,7 +140,7 @@ router.post('/signup', (req, res, next)=>{
             let token = jwt.encode(payload, config.secret);
             req.session.user = {id: new_user._id, email: new_user.email}
             req.session.save()  // Сохранение сессии в БД mongoStore
-            console.log('sess', req.session)
+            // console.log('sess', req.session)
 
             // Собираем секретные данные для регистрации (пароль)
             let secure_data = {
