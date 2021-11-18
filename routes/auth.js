@@ -57,7 +57,8 @@ router.post('/login', (req, res, next)=>{
               
               res.json({
                 token: token, 
-                username: unwrap(user_results[0].username),
+                username: user_results[0].username ? unwrap(user_results[0].username) : null,
+                personal: user_results[0].personal ? unwrap(user_results[0].personal) : null,
                 //user: payload
               });
             }
