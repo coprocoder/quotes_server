@@ -99,7 +99,8 @@ router.post("/add_friend", (req, res, next) => {
   // Преобразовываем входные данные в данные для NoSQL запроса
   if (!!req.body.url) {
     update_fields = {
-      [req.body.url]: wrap(req.body.friend, servertime),
+      // [req.body.url]: wrap(req.body.friend, servertime),
+      [req.body.url]: req.body.friend,
     };
     get_fields = { [req.body.url]: 1 };
   } else {
