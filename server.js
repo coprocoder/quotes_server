@@ -4,56 +4,52 @@
  * Module dependencies.
  */
 
-var app = require('./app');
-var debug = require('debug')('node-test:server');
-var http = require('http');
-const config = require('./config/config.json');
+const app = require("./app");
+const debug = require("debug")("node-test:server");
+const http = require("http");
+const config = require("./config/config.json");
 
 /**
  * Get port from environment and store in Express.
  */
 
-var port = normalizePort(process.env.PORT || '3001');
-app.set('port', port);
+const port = normalizePort(process.env.PORT || "3001");
+app.set("port", port);
 
 /**
  * Create HTTP server.
  */
 
-var server = http.createServer(app);
+const server = http.createServer(app);
 
 /**
  * Listen on provided port, on all network interfaces.
  */
 
-//server.listen(port);
-//server.on('error', onError);
-//server.on('listening', onListening);
-
 // Задаём параметры подключения к БД
 const MongoClient = require("mongodb").MongoClient;
 const url_db = process.env.MONGODB_URI || config.db;
-const mongoClient = new MongoClient(url_db, { useUnifiedTopology: true});
+const mongoClient = new MongoClient(url_db, { useUnifiedTopology: true });
 
-mongoClient.connect(function(err, client){
-    if(err) return console.log(err);
+mongoClient.connect(function (err, client) {
+  if (err) return console.log(err);
 
-    // Открываем соединение с БД
-    dbClient = client;
+  // Открываем соединение с БД
+  dbClient = client;
 
-    // начинаем прослушивание подключений на 3000 порту
-    server.listen(port, function(err){
-        if (err) console.log(err);
-        console.log("Server listening on PORT", port);
-    });
-    server.on('error', onError);
-    server.on('listening', onListening);
+  // начинаем прослушивание подключений на 3000 порту
+  server.listen(port, function (err) {
+    if (err) console.log(err);
+    console.log("Server listening on PORT", port);
+  });
+  server.on("error", onError);
+  server.on("listening", onListening);
 });
 
 process.on("SIGINT", () => {
-    dbClient.close(); // Закрываем соединение с БД
-    console.log("=== SERVER STOPPED BY USER ===");
-    process.exit(); // Останавливаем сервер
+  dbClient.close(); // Закрываем соединение с БД
+  console.log("=== SERVER STOPPED BY USER ===");
+  process.exit(); // Останавливаем сервер
 });
 
 /**
@@ -81,22 +77,20 @@ function normalizePort(val) {
  */
 
 function onError(error) {
-  if (error.syscall !== 'listen') {
+  if (error.syscall !== "listen") {
     throw error;
   }
 
-  var bind = typeof port === 'string'
-    ? 'Pipe ' + port
-    : 'Port ' + port;
+  var bind = typeof port === "string" ? "Pipe " + port : "Port " + port;
 
   // handle specific listen errors with friendly messages
   switch (error.code) {
-    case 'EACCES':
-      console.error(bind + ' requires elevated privileges');
+    case "EACCES":
+      console.error(bind + " requires elevated privileges");
       process.exit(1);
       break;
-    case 'EADDRINUSE':
-      console.error(bind + ' is already in use');
+    case "EADDRINUSE":
+      console.error(bind + " is already in use");
       process.exit(1);
       break;
     default:
@@ -110,10 +104,51 @@ function onError(error) {
 
 function onListening() {
   var addr = server.address();
-  var bind = typeof addr === 'string'
-    ? 'pipe ' + addr
-    : 'port ' + addr.port;
-  debug('Listening on ' + bind);
+  var bind = typeof addr === "string" ? "pipe " + addr : "port " + addr.port;
+  debug("Listening on " + bind);
 }
 
+/**
+ * SOCKET
+ */
 
+// подключаем к серверу Socket.IO
+const io = require("socket.io")(server, {
+  cors: {
+    origin: "*",
+  },
+});
+
+// получаем обработчики событий
+const registerMessageHandlers = require("./socket_handlers/messageHandlers.js");
+const registerUserHandlers = require("./socket_handlers/userHandlers");
+
+// данная функция выполняется при подключении каждого сокета (обычно, один клиент = один сокет)
+const onConnection = (socket) => {
+  // выводим сообщение о подключении пользователя
+  log("User connected");
+
+  // получаем название комнаты из строки запроса "рукопожатия"
+  const { chatId } = socket.handshake.query;
+  // сохраняем название комнаты в соответствующем свойстве сокета
+  socket.chatId = chatId;
+
+  // присоединяемся к комнате (входим в нее)
+  socket.join(chatId);
+
+  // регистрируем обработчики
+  // обратите внимание на передаваемые аргументы
+  registerMessageHandlers(io, socket);
+  registerUserHandlers(io, socket);
+
+  // обрабатываем отключение сокета-пользователя
+  socket.on("disconnect", () => {
+    // выводим сообщение
+    log("User disconnected");
+    // покидаем комнату
+    socket.leave(chatId);
+  });
+};
+
+// обрабатываем подключение
+io.on("connection", onConnection);
