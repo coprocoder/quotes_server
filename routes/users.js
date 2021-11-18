@@ -20,13 +20,16 @@ router.post("/find", (req, res, next) => {
     "personal._V.MiddleName._V",
     "personal._V.LastName._V",
   ];
-  let target_words = req.body.value.split(" ");
+  let target_words = req.body.value.toLowerCase().split(" ");
   let query_fields = [];
   for (let word in target_words) {
     let filter_fields = [];
     for (let field in target_path_list)
       filter_fields.push({
-        [target_path_list[field]]: { $regex: target_words[word] },
+        [target_path_list[field]]: {
+          $regex: target_words[word],
+          $options: "-i",
+        },
       });
     query_fields.push({ $or: filter_fields });
   }
@@ -102,6 +105,7 @@ router.post("/add_friend", (req, res, next) => {
   }
   // console.log('UPDATE CUR update_fields', update_fields)
 
+  // Запись в друзья
   db.get(db.users_database, db.users_collection, filter, get_fields)
     .then((get_results) => {
       // console.log('UPDATE CUR get_results', get_results)
@@ -162,7 +166,6 @@ router.post("/send_message", (req, res, next) => {
   var update_fields = null;
   var get_fields = null;
 
-  // Преобразовываем входные данные в данные для NoSQL запроса
   if (!!req.body.url) {
     actual_data_time =
       req.body.devicetime - // Время сервера
