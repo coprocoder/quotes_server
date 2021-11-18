@@ -1,7 +1,12 @@
 const express = require("express");
 const router = express.Router();
 const db = require("../db/db");
-const { val_key, time_key, unwrap } = require("../public/javascripts/wrapper");
+const {
+  val_key,
+  time_key,
+  wrap,
+  unwrap,
+} = require("../public/javascripts/wrapper");
 
 /* === Select fields from ALL === */
 
@@ -88,17 +93,14 @@ router.post("/add_friend", (req, res, next) => {
 
   var filter = { "email._V": req.body.user.email };
   var servertime = new Date().getTime(); // Текущее время сервера
-  var actual_data_time = null;
   var update_fields = null;
   var get_fields = null;
 
   // Преобразовываем входные данные в данные для NoSQL запроса
   if (!!req.body.url) {
-    actual_data_time =
-      req.body.devicetime - // Время сервера
-      servertime + // Время отправки записи
-      req.body.time; // Время создания записи
-    update_fields = { [req.body.url]: req.body.friend };
+    update_fields = {
+      [req.body.url]: wrap(req.body.friend, servertime),
+    };
     get_fields = { [req.body.url]: 1 };
   } else {
     res.send({ time: null, message: "Фильтр данных не задан" });
@@ -119,24 +121,56 @@ router.post("/add_friend", (req, res, next) => {
             get_result_field = get_result_field[urls[i]];
           }
         }
-      // console.log('UPDATE CUR get_result_field', get_result_field)
+      console.log("add_friend get_result_field", get_result_field);
 
-      db.update(db.users_database, db.users_collection, filter, update_fields)
-        .then((results) => {
-          if (!!results) {
-            res.send({
-              message: "Данные обновлены",
-              time: actual_data_time,
-            });
-          } else {
-            const err = new Error("Данные не обновлены!");
-            err.status = 400;
+      if (!!!get_result_field) {
+        db.update(db.users_database, db.users_collection, filter, update_fields)
+          .then((results) => {
+            if (!!results) {
+              // Добавляем чаты обоим (для отображения)
+              // let chat_url = "chats._V." + servertime;
+              // db.update(
+              //   db.users_database,
+              //   db.users_collection,
+              //   { "username._V": req.body.user.username },
+              //   {
+              //     [chat_url]: wrap({
+              //       user: req.body.friend.username,
+              //       messages: {firstMessage: true}
+              //     }, servertime)
+              //   }
+              // );
+              // db.update(
+              //   db.users_database,
+              //   db.users_collection,
+              //   { "username._V": req.body.friend.username },
+              //   {
+              //     [chat_url]: wrap({
+              //       user: req.body.user.username,
+              //       messages: {firstMessage: true}
+              //     }, servertime)
+              //   }
+              // );
+              
+              res.send({
+                message: "Данные обновлены",
+                time: servertime,
+              });
+            } else {
+              const err = new Error("Данные не обновлены!");
+              err.status = 400;
+              next(err);
+            }
+          })
+          .catch((err) => {
             next(err);
-          }
-        })
-        .catch((err) => {
-          next(err);
+          });
+      } else {
+        res.send({
+          message: "Данные не обновлены",
+          time: null,
         });
+      }
     })
     .catch((err) => {
       next(err);
