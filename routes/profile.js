@@ -26,7 +26,7 @@ router.post("/get", (req, res, next) => {
 
   //console.log('GET req.session', req.session)
   // console.log('GET CUR req.head.auth', req.headers.auth)
-  // console.log('GET CUR req.body', req.body)
+  console.log("GET CUR req.body", req.body);
 
   //var filter = {'email.value': req.session.user.email};
   var token_data = jwt.decode(req.headers.auth, config.secret, false, "HS256");
@@ -63,7 +63,7 @@ router.post("/get", (req, res, next) => {
       // console.log('GET CUR ans', results_found_field)
 
       // Если поле найдено и данные являются актуальными, то возвращаем
-      if (!!results_found_field) {
+      if (!!results_found_field[val_key]) {
         if (
           req.body.time < results_found_field[time_key] ||
           req.body.time == null
@@ -78,7 +78,10 @@ router.post("/get", (req, res, next) => {
           });
         }
       } else {
-        res.send({ [val_key]: null });
+        res.send({
+          [val_key]: null,
+          [time_key]: null,
+        });
       }
     })
     .catch((err) => {
