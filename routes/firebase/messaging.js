@@ -199,6 +199,9 @@ router.post('/register_token', (req, res, next) => {
           next(err);
         })
     })
+    .catch((err) => {
+      next(err);
+    })
 })
 
 router.post('/delete_token', (req, res, next) => {
