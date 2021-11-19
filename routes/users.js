@@ -92,7 +92,8 @@ router.post("/add_friend", (req, res, next) => {
   //   });
 
   var filter = { "email._V": req.body.user.email };
-  var servertime = new Date().getTime(); // Текущее время сервера
+  // var servertime = new Date().getTime(); // Текущее время сервера
+  var chat_id = req.body.time;
   var update_fields = null;
   var get_fields = null;
 
@@ -100,7 +101,7 @@ router.post("/add_friend", (req, res, next) => {
   if (!!req.body.url) {
     update_fields = {
       // [req.body.url]: wrap(req.body.friend, servertime),
-      [req.body.url]: req.body.friend,
+      [req.body.url]: wrap(req.body.friend, req.body.time),
     };
     get_fields = { [req.body.url]: 1 };
   } else {
@@ -124,23 +125,28 @@ router.post("/add_friend", (req, res, next) => {
         }
       console.log("add_friend get_result_field", get_result_field);
 
+      // Если друг отсутствует
       if (!!!get_result_field) {
         db.update(db.users_database, db.users_collection, filter, update_fields)
           .then((results) => {
             if (!!results) {
-              // Добавляем чаты обоим (для отображения)
-              // let chat_url = "chats._V." + servertime;
-              // db.update(
-              //   db.users_database,
-              //   db.users_collection,
-              //   { "username._V": req.body.user.username },
-              //   {
-              //     [chat_url]: wrap({
-              //       user: req.body.friend.username,
-              //       messages: {firstMessage: true}
-              //     }, servertime)
-              //   }
-              // );
+              // Добавляем чат собеседнику
+              let chat_url = "chats._V." + chat_id;
+              db.update(
+                db.users_database,
+                db.users_collection,
+                { "username._V": req.body.user.username },
+                {
+                  [chat_url]: wrap(
+                    {
+                      user: req.body.friend.username,
+                      messages: { firstMessage: true },
+                    },
+                    chat_id
+                  ),
+                }
+              );
+              // Добавляем чат себе
               // db.update(
               //   db.users_database,
               //   db.users_collection,
@@ -152,10 +158,11 @@ router.post("/add_friend", (req, res, next) => {
               //     }, servertime)
               //   }
               // );
-              
+
               res.send({
                 message: "Данные обновлены",
-                time: servertime,
+                time: req.body.tim,
+                exist: false,
               });
             } else {
               const err = new Error("Данные не обновлены!");
@@ -167,9 +174,12 @@ router.post("/add_friend", (req, res, next) => {
             next(err);
           });
       } else {
+        // Если друг уже добавлен, отправляем его chat_id для добавления в локальное хранилище устройства
+        console.log("friend exist", get_result_field);
         res.send({
-          message: "Данные не обновлены",
-          time: null,
+          message: "Данные обновлены",
+          time: unwrap(get_result_field).chat_id,
+          exist: false,
         });
       }
     })
