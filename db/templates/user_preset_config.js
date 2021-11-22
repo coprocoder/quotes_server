@@ -46,10 +46,16 @@ module.exports = user_preset_config = {
                             "pre": "/",
                             "constant": "100",
                             "name": null
+                        },
+                        {
+                            "pre": "*",
+                            "constant": "100",
+                            "name": null
                         }
                     ],
                     "color": 1,
                     "useResult": true,
+                    "suf": "%",
                     "key": "1"
                 }
             ],
@@ -107,10 +113,16 @@ module.exports = user_preset_config = {
                             "pre": "/",
                             "constant": "10000",
                             "name": null
+                        },
+                        {
+                            "pre": "*",
+                            "constant": "100",
+                            "name": null
                         }
                     ],
                     "color": 3,
                     "useResult": true,
+                    "suf": "%",
                     "key": "1"
                 }
             ],

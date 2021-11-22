@@ -153,8 +153,7 @@ module.exports.updloadFile = function(cur_db, cur_collection, filter, fields) {
 
 
 
-/* === NEW ITEMS BLOCK === */
-
+/* === Create new document === */
 module.exports.create = function(cur_db, cur_collection, data) {
   console.log('db CREATE DATA', data)
   return new Promise((resolve, reject) => {
@@ -179,6 +178,7 @@ module.exports.create = function(cur_db, cur_collection, data) {
   })
 }
 
+/* === Delete full document === */
 module.exports.delete = function(cur_db, cur_collection, data) {
   console.log('db DELETE DATA', data)
   return new Promise((resolve, reject) => {
