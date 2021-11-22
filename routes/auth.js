@@ -141,12 +141,12 @@ router.post("/signup", (req, res, next) => {
             ),
             servertime
           ),
-          personal: wrap({}, servertime),
-          medicaments: wrap({}, servertime),
-          schedule: wrap({}, servertime),
-          reminds: wrap({}, servertime),
-          chats: wrap({}, servertime),
-          friends: wrap({}, servertime),
+          // personal: wrap(null, servertime),
+          // medicaments: wrap(null, servertime),
+          // schedule: wrap(null, servertime),
+          // reminds: wrap(null, servertime),
+          // chats: wrap(null, servertime),
+          // friends: wrap(null, servertime),
         };
 
         // Генерация шаблонных полей истории
