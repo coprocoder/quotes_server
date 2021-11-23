@@ -15,12 +15,14 @@ module.exports = (io, socket) => {
     //   .then((results) => {
     //     return results;
     //   });
+    console.log('socket getUsers', users)
     io.in(socket.chatId).emit("users", users);
   };
 
   // обрабатываем добавление пользователя
   // функция принимает объект с именем пользователя и его id
   const addUser = ({ username, userId }) => {
+    console.log('socket addUser', username, userId)
     // проверяем, имеется ли пользователь в БД
     if (!users[userId]) {
       // если не имеется, добавляем его в БД
@@ -35,6 +37,7 @@ module.exports = (io, socket) => {
 
   // обрабатываем удаление пользователя
   const removeUser = (userId) => {
+    console.log('socket removeUser', userId)
     users[userId].online = false;
     getUsers();
   };

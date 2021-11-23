@@ -126,12 +126,13 @@ const registerUserHandlers = require("./socket_handlers/userHandlers");
 // данная функция выполняется при подключении каждого сокета (обычно, один клиент = один сокет)
 const onConnection = (socket) => {
   // выводим сообщение о подключении пользователя
-  log("User connected");
+  console.log("User connected");
 
   // получаем название комнаты из строки запроса "рукопожатия"
-  const { chatId } = socket.handshake.query;
+  const { chatId, tsName } = socket.handshake.query;
   // сохраняем название комнаты в соответствующем свойстве сокета
   socket.chatId = chatId;
+  socket.tsName = tsName; // topic starter username
 
   // присоединяемся к комнате (входим в нее)
   socket.join(chatId);
@@ -144,11 +145,10 @@ const onConnection = (socket) => {
   // обрабатываем отключение сокета-пользователя
   socket.on("disconnect", () => {
     // выводим сообщение
-    log("User disconnected");
+    console.log("User disconnected");
     // покидаем комнату
     socket.leave(chatId);
   });
 };
 
-// обрабатываем подключение
 io.on("connection", onConnection);
