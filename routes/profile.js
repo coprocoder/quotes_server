@@ -9,7 +9,7 @@ const {
   time_key,
   wrap,
   unwrap,
-} = require("../public/javascripts/wrapper");
+} = require("../db/wrapper");
 
 /* === SELECT INFO  === */
 
