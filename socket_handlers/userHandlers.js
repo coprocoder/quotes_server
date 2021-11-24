@@ -8,37 +8,31 @@ const users = {
 module.exports = (io, socket) => {
   // обрабатываем запрос на получение пользователей
   const getUsers = async () => {
-    // var filter = {};
-    // var fields = { "username": 1, "online": 1 };
-    // const users = await db
-    //   .get(db.users_database, db.users_collection, filter, fields)
-    //   .then((results) => {
-    //     return results;
-    //   });
     console.log('socket getUsers', users)
     io.in(socket.chatId).emit("users", users);
   };
+  
 
   // обрабатываем добавление пользователя
   // функция принимает объект с именем пользователя и его id
-  const addUser = ({ username, userId }) => {
-    console.log('socket addUser', username, userId)
+  const addUser = ({ username }) => {
+    console.log('socket addUser', username, users)
     // проверяем, имеется ли пользователь в БД
-    if (!users[userId]) {
+    if (!users[username]) {
       // если не имеется, добавляем его в БД
-      users[userId] = { username, online: true };
+      users[username] = { username, online: true };
     } else {
       // если имеется, меняем его статус на онлайн
-      users[userId].online = true;
+      users[username].online = true;
     }
     // выполняем запрос на получение пользователей
     getUsers();
   };
 
   // обрабатываем удаление пользователя
-  const removeUser = (userId) => {
-    console.log('socket removeUser', userId)
-    users[userId].online = false;
+  const removeUser = (username) => {
+    console.log('socket removeUser', username)
+    users[username].online = false;
     getUsers();
   };
 
