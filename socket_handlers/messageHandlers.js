@@ -5,24 +5,15 @@ module.exports = (io, socket) => {
   // обрабатываем запрос на получение сообщений
   const getMessages = async () => {
     // console.log("socket getMessages", socket.tsName, socket.chatId);
-    console.log("socket getMessages", socket);
+    // console.log("socket getMessages", socket);
+
     // получаем сообщения из БД
-    let url = "chats._V." + socket.chatId + "._V.messages";
-    var filter = { "username._V": socket.tsName };
-    var fields = { [url]: 1 };
+    var filter = { id: +socket.chatId };
+    var fields = { messages: 1 };
     const messages = await db
-      .get(db.users_database, db.users_collection, filter, fields)
+      .get(db.users_database, db.chats_collection, filter, fields)
       .then((results) => {
-        // Проход по объекту юзера поиска нужного поля
-        let results_found_field = results[0];
-        let urls = url.split(".");
-        // console.log('GET CUR results_found_field', results_found_field)
-        // console.log('GET CUR urls', urls)
-        for (i in urls) {
-          if (results_found_field[urls[i]] != undefined)
-            results_found_field = results_found_field[urls[i]];
-        }
-        return unwrap(results_found_field);
+        return results[0].messages;
       });
     console.log("socket messages", messages);
 
@@ -33,51 +24,28 @@ module.exports = (io, socket) => {
 
   // обрабатываем добавление сообщения
   // функция принимает объект сообщения
-  const addMessage = (message) => {
+  const addMessage = (message, time) => {
     console.log("socket addMessage", message);
 
-    console.log("send_message CUR req.body", req.body);
+    var filter = { id: Number(socket.chatId) };
+    var update_fields = { ["messages." + time]: message };
 
-    let filter = { "username._V": req.body.user };
-    let servertime = new Date().getTime(); // Текущее время сервера
-    let actual_data_time =
-      req.body.devicetime - // Время сервера
-      servertime + // Время отправки записи
-      req.body.time; // Время создания записи
-    let update_fields = { [req.body.url]: req.body.value };
-    let get_fields = { [req.body.url]: 1 };
-    // console.log('UPDATE CUR update_fields', update_fields)
-
-    db.get(db.users_database, db.users_collection, filter, get_fields)
-      .then((get_results) => {
-        // console.log('UPDATE CUR get_results', get_results)
-
-        // Достаём нужное поле по URL
-        let urls = req.body.url.split(".");
-        let get_result_field = get_results[0];
-        if (get_results.length > 0)
-          for (i in urls) {
-            if (get_result_field != undefined) {
-              get_result_field = get_result_field[urls[i]];
-            }
-          }
-        // console.log('UPDATE CUR get_result_field', get_result_field)
-
-        db.update(db.users_database, db.users_collection, filter, update_fields)
-          .then((results) => {
-            if (!!results) {
-              return {
-                message: "Данные обновлены",
-                time: actual_data_time,
-              };
-            } else {
-              return {
-                message: "Данные не обновлены",
-                time: null,
-              };
-            }
-          })
+    db.update(db.users_database, db.chats_collection, filter, update_fields)
+      .then((results) => {
+        if (!!results) {
+          res.send({
+            message: "Данные обновлены",
+            time: time,
+          });
+        } else {
+          const err = new Error("Данные не обновлены!");
+          err.status = 400;
+          next(err);
+        }
       })
+      .catch((err) => {
+        next(err);
+      });
 
     // выполняем запрос на получение сообщений
     getMessages();

@@ -89,7 +89,8 @@ router.post("/get", (req, res, next) => {
   db.get(db.users_database, db.users_collection, filter, get_fields)
     .then((user_chats) => {
       console.log("user_chats", user_chats);
-      let chats_id_list = user_chats[0].chats && unwrap(user_chats[0].chats) || []
+      let chats_id_list =
+        (user_chats[0].chats && unwrap(user_chats[0].chats)) || [];
       console.log("chats_id_list", chats_id_list);
 
       // Фильтрация чатов по юзеру (только те, в которые он добавлен)
@@ -99,9 +100,13 @@ router.post("/get", (req, res, next) => {
       db.get(db.users_database, db.chats_collection, filter, get_fields)
         .then((get_results) => {
           console.log("chat get get_results", get_results, typeof get_results);
-          res.send({
-            data: get_results,
-          });
+
+          let chats_dict = {};
+          for (let i in get_results) {
+            chats_dict[get_results[i].id] = get_results[i];
+          }
+          res.send(chats_dict);
+          // res.send(get_results);
         })
         .catch((err) => {
           next(err);
