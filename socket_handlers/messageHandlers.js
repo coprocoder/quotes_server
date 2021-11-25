@@ -19,6 +19,7 @@ module.exports = (io, socket) => {
 
     // передаем сообщения пользователям, находящимся в комнате
     // синонимы - распространение, вещание, публикация
+
     io.in(socket.chatId).emit("messages", messages);
   };
 
@@ -47,8 +48,9 @@ module.exports = (io, socket) => {
         next(err);
       });
 
+    io.in(socket.chatId).emit("messages:last", message, time);
     // выполняем запрос на получение сообщений
-    getMessages();
+    // getMessages();
   };
 
   //   // обрабатываем удаление сообщение
