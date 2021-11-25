@@ -31,35 +31,34 @@ router.post("/login", (req, res, next) => {
   // Стучимся в публичную БД
   db.get(db.users_database, db.users_collection, filter, fields)
     .then((user_results) => {
-      // console.log('user_results[0]', user_results[0])
+      console.log('user_results[0]', user_results[0])
       if (user_results.length > 0) {
-        var filter = { ["user_id"]: user_results[0]._id };
+        let user = user_results[0];
+        var filter = { ["user_id"]: user._id };
 
         // Стучимся в приватную БД
         db.get(db.secure_database, db.secure_collection, filter, fields)
           .then((secure_results) => {
-            // console.log('secure_results[0]', secure_results[0])
+            console.log('secure_results[0]', secure_results[0])
             if (
               conversion.isValidPassword(
                 req.body.password,
                 secure_results[0].password
               )
             ) {
-              let user = user_results[0];
-              // console.log('user', user)
-
               // Данные внутри токена
               let payload = {
                 id: user._id,
-                username: user_results[0].username,
-                email: user_results[0].email,
+                username: user.username,
+                email: user.email,
                 role: secure_results[0].role,
               };
               let token = jwt.encode(payload, config.secret);
+              console.log('login token', token)
 
               req.session.user = {
                 id: user._id,
-                email: unwrap(user_results[0].email),
+                email: unwrap(user.email),
               };
               req.session.isLogged = true;
               req.session.save(); // Сохранение сессии в БД mongoStore
@@ -67,11 +66,11 @@ router.post("/login", (req, res, next) => {
 
               res.json({
                 token: token,
-                username: user_results[0].username
-                  ? unwrap(user_results[0].username)
+                username: user.username
+                  ? unwrap(user.username)
                   : null,
-                personal: user_results[0].personal
-                  ? unwrap(user_results[0].personal)
+                personal: user.personal
+                  ? unwrap(user.personal)
                   : null,
                 //user: payload
               });
@@ -148,13 +147,6 @@ router.post("/signup", (req, res, next) => {
           // chats: wrap(null, servertime),
           // friends: wrap(null, servertime),
         };
-
-        // Генерация шаблонных полей истории
-        // data['email'] = wrap(req.body.email, servertime)
-        // data['username'] = wrap(req.body.username, servertime)
-        // data['diary'] = wrap(user_preset_config.diary, servertime)
-        // data['history'] = wrap(Object.assign({}, ...Object.keys(user_preset_config.variables).map(x => ({[x]: {} }))), servertime)
-        // data['variables'] = wrap(Object.assign({}, ...Object.keys(user_preset_config.variables).map(x => ({[x]: user_preset_config.variables[x] }))), servertime)
 
         // Записываем данные в обычную БД
         db.create(db.users_database, db.users_collection, data)

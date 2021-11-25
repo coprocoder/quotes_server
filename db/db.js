@@ -6,11 +6,11 @@ const url = process.env.MONGODB_URI || config.db;
 
 module.exports.users_database = 'usersdb';
 module.exports.users_collection = 'users';
+module.exports.chats_collection = 'chats';
 
 module.exports.secure_database = 'securedb';
 module.exports.secure_collection = 'users';
 
-module.exports.public_database = 'publicdb';
 
 module.exports.catalog_database = 'catalogdb';
 module.exports.catalog_collection_med = 'med';
