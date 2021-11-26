@@ -20,7 +20,12 @@ router.post("/login", (req, res, next) => {
       password: <str>
   */
   console.log("login req.body", req.body);
-  var filter = { ["email." + val_key]: req.body.email };
+  var filter = {
+    $or: [
+      { ["username." + val_key]: req.body.email },
+      { ["email." + val_key]: req.body.email },
+    ],
+  };
   var fields = {};
 
   // Стучимся в публичную БД
