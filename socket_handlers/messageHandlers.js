@@ -1,12 +1,8 @@
 const db = require("../db/db");
-const { val_key, time_key, wrap, unwrap } = require("../db/wrapper");
 
 module.exports = (io, socket) => {
   // обрабатываем запрос на получение сообщений
   const getMessages = async () => {
-    // console.log("socket getMessages", socket.tsName, socket.chatId);
-    // console.log("socket getMessages", socket);
-
     // получаем сообщения из БД
     var filter = { id: +socket.chatId };
     var fields = { messages: 1 };
@@ -16,9 +12,6 @@ module.exports = (io, socket) => {
         return results[0].messages;
       });
     console.log("socket messages", messages);
-
-    // передаем сообщения пользователям, находящимся в комнате
-    // синонимы - распространение, вещание, публикация
 
     io.in(socket.chatId).emit("messages", messages);
   };
@@ -49,15 +42,12 @@ module.exports = (io, socket) => {
       });
 
     io.in(socket.chatId).emit("messages:last", message, time);
-    // выполняем запрос на получение сообщений
-    // getMessages();
   };
 
   //   // обрабатываем удаление сообщение
   //   // функция принимает id сообщения
   //   const removeMessage = (messageId) => {
   //     db.get("messages").remove({ messageId }).write();
-
   //     getMessages();
   //   };
 
