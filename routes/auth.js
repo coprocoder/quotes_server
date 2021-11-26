@@ -111,19 +111,13 @@ router.post("/signup", (req, res, next) => {
       db.get(db.users_database, db.users_collection, filter_username, fields)
         .then((results_username) => {
           if (results_email.length) {
-            let message = "Пользователь с такой почтой уже существует!";
-            const err = new Error(message);
-            err.status = 700;
-            err.statusText = message;
-            err.message = message;
-            next(err);
+            res.status(400).json({
+              message: "Пользователь с такой почтой уже существует!",
+            });
           } else if (results_username.length) {
-            let message = "Пользователь с таким именем уже существует!";
-            const err = new Error(message);
-            err.status = 701;
-            err.statusText = message;
-            err.message = message;
-            next(err);
+            res.status(400).json({
+              message: "Пользователь с таким именем уже существует!",
+            });
           } else {
             // Собираем данные для регистрации
             let data = {
