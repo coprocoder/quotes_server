@@ -112,8 +112,7 @@ router.post('/register_token', (req, res, next) => {
       device: <device name>
     }
   */
-
-  console.log('firebase register_token req', req)
+ 
   console.log('firebase register_token req.body', req.body)
   console.log('firebase register_token req.headers.auth', req.headers.auth)
 

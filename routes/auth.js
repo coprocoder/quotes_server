@@ -56,12 +56,12 @@ router.post("/login", (req, res, next) => {
               let token = jwt.encode(payload, config.secret);
               console.log("login token", token);
 
-              req.session.user = {
-                id: user._id,
-                email: unwrap(user.email),
-              };
-              req.session.isLogged = true;
-              req.session.save(); // Сохранение сессии в БД mongoStore
+              // req.session.user = {
+              //   id: user._id,
+              //   email: unwrap(user.email),
+              // };
+              // req.session.isLogged = true;
+              // req.session.save(); // Сохранение сессии в БД mongoStore
               // console.log('login req.session', req.session)
 
               res.json({
@@ -92,8 +92,8 @@ router.post("/login", (req, res, next) => {
 
 router.post("/logout", (req, res, next) => {
   // console.log('logout req.session BEFORE', req.session)
-  req.session.isLogged = false;
-  if (req.session.user) delete req.session.user;
+  // req.session.isLogged = false;
+  // if (req.session.user) delete req.session.user;
   res.json({ msg: "logout succesfull" });
 });
 
@@ -162,8 +162,8 @@ router.post("/signup", (req, res, next) => {
                   role: 0,
                 };
                 let token = jwt.encode(payload, config.secret);
-                req.session.user = { id: new_user._id, email: new_user.email };
-                req.session.save(); // Сохранение сессии в БД mongoStore
+                // req.session.user = { id: new_user._id, email: new_user.email };
+                // req.session.save(); // Сохранение сессии в БД mongoStore
                 // console.log('sess', req.session)
 
                 // Собираем секретные данные для регистрации (пароль)

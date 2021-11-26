@@ -11,8 +11,8 @@ const config = require("./config/config.json");
 
 //### Mongo sessions
 // const mongoose = require("mongoose")
-const session = require("express-session");
-const MongoStore = require("connect-mongo")(session);
+// const session = require("express-session");
+// const MongoStore = require("connect-mongo")(session);
 
 //### Routers Files
 const indexRouter = require("./routes/index");
@@ -63,32 +63,32 @@ app.use(function (req, res, next) {
 });
 
 //### Sessions (saved in cache)
-var sess = {
-  secret: "super_secret_word", // секретное слово для шифрования
-  credentials: "include",
-  resave: true,
-  saveUninitialized: false,
-  cookie: {
-    path: "/", // где действует
-    httpOnly: true, // чтобы куку не могли читать на клиенте
+// var sess = {
+//   secret: "super_secret_word", // секретное слово для шифрования
+//   credentials: "include",
+//   resave: true,
+//   saveUninitialized: false,
+//   cookie: {
+//     path: "/", // где действует
+//     httpOnly: true, // чтобы куку не могли читать на клиенте
 
-    // время жизни куки в милисекундах(null = infinity, 3600000 = 1 Hour)
-    // expires: false // infinity live time
-    expires: 300000,
-    // не работает, дата устанавливается на момент запуска сервера, время жизни отрицательное
-    // expires: new Date(Date.now() + 30000),
-  },
-  store: new MongoStore({
-    url: process.env.MONGODB_URI || config.db + "/usersdb",
-  }),
-  rolling: true,
-};
-if (app.get("env") === "production") {
-  console.log("== production server ==");
-  app.set("trust proxy", 1); // trust first proxy
-  sess.cookie.secure = true; // serve secure cookies
-}
-app.use(session(sess));
+//     // время жизни куки в милисекундах(null = infinity, 3600000 = 1 Hour)
+//     // expires: false // infinity live time
+//     expires: 300000,
+//     // не работает, дата устанавливается на момент запуска сервера, время жизни отрицательное
+//     // expires: new Date(Date.now() + 30000),
+//   },
+//   store: new MongoStore({
+//     url: process.env.MONGODB_URI || config.db + "/usersdb",
+//   }),
+//   rolling: true,
+// };
+// if (app.get("env") === "production") {
+//   console.log("== production server ==");
+//   app.set("trust proxy", 1); // trust first proxy
+//   sess.cookie.secure = true; // serve secure cookies
+// }
+// app.use(session(sess));
 
 //### Запись и хранение данных в куки
 // app.all('/', function (req, res, next) {
@@ -154,7 +154,7 @@ app.use(function (err, req, res, next) {
 
   // render the error page
   res.status(err.status || 500);
-  res.render("error", { code: err.status, message: err.message });
+  res.send({ code: err.status, message: err.message });
 });
 
 module.exports = app;

@@ -36,7 +36,7 @@ router.post("/get", (req, res, next) => {
 
   db.get(db.users_database, db.users_collection, filter, fields)
     .then((results) => {
-      // console.log('GET CUR results', results)
+      console.log('GET CUR results', results)
 
       // Достаём по url нужное вложенное поле из результата
       let results_found_field = results[0];
@@ -52,15 +52,15 @@ router.post("/get", (req, res, next) => {
           for (i in urls) {
             if (results_found_field[urls[i]] != undefined)
               results_found_field = results_found_field[urls[i]];
-            else
-              results_found_field = {
-                [val_key]: null,
-                [time_key]: null,
-              };
+            // else
+            //   results_found_field = {
+            //     [val_key]: null,
+            //     [time_key]: null,
+            //   };
           }
         }
       }
-      // console.log('GET CUR ans', results_found_field)
+      console.log('GET CUR ans', results_found_field)
 
       // Если поле найдено и данные являются актуальными, то возвращаем
       if (!!results_found_field[val_key]) {
@@ -153,8 +153,8 @@ router.post("/update", (req, res, next) => {
             .then((results) => {
               if (!!results) {
                 // Для динамической переавторизации при изменении email
-                if (!!req.body.email)
-                  req.session.user.email = req.body.email.value;
+                // if (!!req.body.email)
+                //   req.session.user.email = req.body.email.value;
                 res.send({
                   message: "Данные обновлены",
                   code: 0,
@@ -183,8 +183,8 @@ router.post("/update", (req, res, next) => {
           .then((results) => {
             if (!!results) {
               // Для динамической переавторизации при изменении email
-              if (!!req.body.email)
-                req.session.user.email = req.body.email.value;
+              // if (!!req.body.email)
+              //   req.session.user.email = req.body.email.value;
               res.send({
                 message: "Данные обновлены",
                 code: 0,
