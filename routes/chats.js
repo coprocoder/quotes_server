@@ -45,7 +45,10 @@ router.post("/create", (req, res, next) => {
                 .map((item) => item.chats._V)[0] || [];
             user_chats.push(chat_id);
 
-            var update_fields = { ["chats._V"]: user_chats };
+            var update_fields = {
+              ["chats._V"]: user_chats,
+              ["chats._T"]: req.body.chat_id,
+            };
             db.update(
               db.users_database,
               db.users_collection,
