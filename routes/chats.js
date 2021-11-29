@@ -13,7 +13,7 @@ router.post("/create", (req, res, next) => {
   }
   // console.log("chat users", users_dict);
   let chat_item = {
-    id: chat_id,
+    id: req.body.chat_id,
     messages: {},
     users: users_dict,
   };
@@ -43,7 +43,7 @@ router.post("/create", (req, res, next) => {
               get_results
                 .filter((item) => !!item.chats)
                 .map((item) => item.chats._V)[0] || [];
-            user_chats.push(chat_id);
+            user_chats.push(req.body.chat_id);
 
             var update_fields = {
               ["chats._V"]: user_chats,
