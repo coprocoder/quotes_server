@@ -29,7 +29,6 @@ mongoClient.connect(function (err, client) {
   app.set("port", port);
   const server = http.createServer(app);
 
-  // начинаем прослушивание подключений на 3000 порту
   server.listen(port, function (err) {
     if (err) console.log(err);
     console.log("Server listening on PORT", port);
