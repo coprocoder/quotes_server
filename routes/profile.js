@@ -4,12 +4,7 @@ const db = require("../db/db");
 const jwt = require("jwt-simple");
 const config = require("../config/config");
 
-const {
-  val_key,
-  time_key,
-  wrap,
-  unwrap,
-} = require("../db/wrapper");
+const { val_key, time_key, wrap, unwrap } = require("../db/wrapper");
 
 /* === SELECT INFO  === */
 
@@ -36,7 +31,7 @@ router.post("/get", (req, res, next) => {
 
   db.get(db.users_database, db.users_collection, filter, fields)
     .then((results) => {
-      console.log('GET CUR results', results)
+      // console.log('GET CUR results', results)
 
       // Достаём по url нужное вложенное поле из результата
       let results_found_field = results[0];
@@ -60,7 +55,7 @@ router.post("/get", (req, res, next) => {
           }
         }
       }
-      console.log('GET CUR ans', results_found_field)
+      // console.log('GET CUR ans', results_found_field)
 
       // Если поле найдено и данные являются актуальными, то возвращаем
       if (!!results_found_field[val_key]) {
@@ -334,15 +329,6 @@ router.post("/fill_diary", (req, res, next) => {
       let variables = unwrap(get_results[0]["variables"]);
 
       let hist_keys_list = Object.keys(history);
-
-      // Чистим history от ключей, что нет в variables
-      // for (let hist_key in hist_keys_list) {
-      //   if (Object.keys(variables).indexOf(hist_keys_list[hist_key]) == -1)
-      //     delete history[hist_keys_list[hist_key]]
-      // }
-
-      // console.log('FILL CUR history', history)
-      // console.log('FILL CUR variables', variables)
 
       // Добавляем в историю значения в пределах лимитов из variable
       hist_keys_list = Object.keys(history);
