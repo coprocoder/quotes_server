@@ -2,15 +2,51 @@ const express = require("express");
 const router = express.Router();
 const db = require("../db/db");
 const { val_key, time_key, wrap, unwrap } = require("../db/wrapper");
+const ObjectID = require("mongodb").ObjectID;
 
-router.post("/create", (req, res, next) => {
+router.post("/create", async (req, res, next) => {
   console.log("chat create CUR req.body", req.body);
+
+  // async function generateUsersDict() {
+  //   var users_dict = {};
+  //   var chat_id = req.body.chat_id;
+  //   console.log("CHAT chat_id", chat_id);
+  //   let users = req.body.users_email_list;
+  //   let users_refs = [];
+  //   console.log("CHAT users", users);
+  //   const promises = users.map(async (user_email, index) => {
+  //     var filter = { "email._V": user_email };
+  //     var get_fields = { _id: 1 };
+  //     await db
+  //       .get(db.users_database, db.users_collection, filter, get_fields)
+  //       .then((get_results) => {
+  //         console.log("CHAT get_results", get_results);
+  //         console.log("CHAT get_results[0]._id", get_results[0]._id);
+  //         console.log("CHAT ObjectID 1", new ObjectID(get_results[0]._id));
+  //         console.log("CHAT ObjectID 2", new ObjectID(get_results[0]._id + ""));
+  //         users_refs.push({
+  //           $ref: "users",
+  //           $id: new ObjectID(get_results[0]._id + ""),
+  //           $db: "usersdb",
+  //         });
+  //       });
+  //   });
+  //   await Promise.all(promises);
+  //   console.log("CHAT users_refs", users_refs);
+  //   for (let i in users_refs) {
+  //     users_dict[chat_id++] = users_refs[i];
+  //   }
+  //   return users_dict;
+  // }
+  // let users_dict = await generateUsersDict();
+  // console.log("CHAT users_dict", users_dict);
 
   var chat_id = req.body.chat_id;
   var users_dict = {};
   for (let i in req.body.users) {
     users_dict[chat_id++] = req.body.users[i];
   }
+
   // console.log("chat users", users_dict);
   let chat_item = {
     id: req.body.chat_id,
@@ -24,11 +60,11 @@ router.post("/create", (req, res, next) => {
     .then((results) => {
       //console.log("new chat results", results);
 
+      // for (let id in req.body.users_email_list) {
       for (let id in req.body.users) {
         var filter = { "email._V": req.body.users[id].email };
+        // var filter = { "email._V": req.body.users_email_list[id] };
         var get_fields = { "chats._V": 1 };
-
-        // console.log("chat create user", req.body.users[id]);
 
         // console.log('UPDATE CUR update_fields', update_fields)
 
@@ -38,6 +74,7 @@ router.post("/create", (req, res, next) => {
             // console.log("chat create get_results 1", get_results);
 
             var filter = { "email._V": req.body.users[id].email };
+            // var filter = { "email._V": req.body.users_email_list[id] };
             // console.log("chat create update filter", filter);
             let user_chats =
               get_results
