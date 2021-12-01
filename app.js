@@ -15,7 +15,6 @@ const config = require("./config/config.json");
 // const MongoStore = require("connect-mongo")(session);
 
 //### Routers Files
-const indexRouter = require("./routes/index");
 const authRouter = require("./routes/auth");
 const usersRouter = require("./routes/users");
 const chatsRouter = require("./routes/chats");
@@ -133,7 +132,6 @@ app.use("/", function (req, res, next) {
 });
 
 //### Routes
-app.use("/api", indexRouter); // Корень, базовые страницы
 app.use("/api/auth", authRouter); // Авторизация/регистрация
 app.use("/api/users", usersRouter); // Все пользователи
 app.use("/api/chats", chatsRouter); // Все пользователи
