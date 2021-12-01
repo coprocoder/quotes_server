@@ -6,6 +6,7 @@ const url = process.env.MONGODB_URI || config.db;
 
 module.exports.users_database = 'usersdb';
 module.exports.users_collection = 'users';
+module.exports.diary_collection = 'diary';
 module.exports.chats_collection = 'chats';
 
 module.exports.secure_database = 'securedb';

@@ -125,9 +125,12 @@ router.post("/signup", (req, res, next) => {
             });
           } else {
             // Собираем данные для регистрации
-            let data = {
+            let profile_data = {
               email: wrap(req.body.email, servertime),
               username: wrap(req.body.username, servertime),
+            };
+            let diary_data = {
+              email: wrap(req.body.email, servertime),
               diary: wrap(user_preset_config.diary, servertime),
               history: wrap(
                 Object.assign(
@@ -150,7 +153,7 @@ router.post("/signup", (req, res, next) => {
             };
 
             // Записываем данные в обычную БД
-            db.create(db.users_database, db.users_collection, data)
+            db.create(db.users_database, db.users_collection, profile_data)
               .then((results) => {
                 var new_user = results.ops[0];
                 // console.log('new_user', new_user)
@@ -182,6 +185,15 @@ router.post("/signup", (req, res, next) => {
                   .catch((err) => {
                     next(err);
                   });
+              })
+              .catch((err) => {
+                next(err);
+              });
+
+            // Записываем информацию о дневниках в БД
+            db.create(db.users_database, db.diary_collection, diary_data)
+              .then((results) => {
+                console.log('Diary data was created')
               })
               .catch((err) => {
                 next(err);

@@ -11,18 +11,11 @@ const firebaseConfig = {
   appId: "1:302871522782:web:a01ae6f91984d7632d814f",
   measurementId: "G-BJFXLDTJ9L",
   credential: admin.credential.cert(serviceAccount),
-  //   credential: admin.credential.applicationDefault(),
-  //   databaseURL: 'https://<DATABASE_NAME>.firebaseio.com'
 };
 
 // Initialize Firebase
 const app = admin.initializeApp(firebaseConfig);
 
-// let defaultAuth = app.auth();
-// let defaultDatabase = app.database();
-
 let messaging = app.messaging();
-
-// const messaging = {}
 
 module.exports = messaging;

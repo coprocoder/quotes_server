@@ -1,10 +1,10 @@
 const express = require("express");
 const router = express.Router();
-const db = require("../db/db");
 const jwt = require("jwt-simple");
-const config = require("../config/config");
 
-const { val_key, time_key, wrap, unwrap } = require("../db/wrapper");
+const config = require("../../config/config");
+const db = require("../../db/db");
+const { val_key, time_key, wrap, unwrap } = require("../../db/wrapper");
 
 /* === SELECT INFO  === */
 
@@ -19,19 +19,18 @@ router.post("/get", (req, res, next) => {
     ELSE if < then return {value:db_value, time: db_time}
   */
 
-  //console.log('GET req.session', req.session)
-  // console.log('GET CUR req.head.auth', req.headers.auth)
-  console.log("GET CUR req.body", req.body);
+  console.log("GET DIARY req.body", req.body);
 
   //var filter = {'email.value': req.session.user.email};
-  var token_data = jwt.decode(req.headers.auth, config.secret, false, "HS256");
-  // console.log('GET CUR token_data', token_data)
-  var filter = { _id: token_data.id };
+  var token_data = jwt.
+  decode(req.headers.auth, config.secret, false, "HS256");
+  // console.log('GET DIARY token_data', token_data)
+  var filter = { email: token_data.email };
   var fields = !!req.body.url ? { [req.body.url]: 1 } : {};
 
-  db.get(db.users_database, db.users_collection, filter, fields)
+  db.get(db.users_database, db.diary_collection, filter, fields)
     .then((results) => {
-      // console.log('GET CUR results', results)
+      // console.log('GET DIARY results', results)
 
       // Достаём по url нужное вложенное поле из результата
       let results_found_field = results[0];
@@ -42,8 +41,8 @@ router.post("/get", (req, res, next) => {
         fields = { [req.body.url]: 1 };
         if (req.body.url.length > 0) {
           urls = req.body.url.split(".");
-          // console.log('GET CUR results_found_field', results_found_field)
-          // console.log('GET CUR urls', urls)
+          // console.log('GET DIARY results_found_field', results_found_field)
+          // console.log('GET DIARY urls', urls)
           for (i in urls) {
             if (results_found_field[urls[i]] != undefined)
               results_found_field = results_found_field[urls[i]];
@@ -55,7 +54,7 @@ router.post("/get", (req, res, next) => {
           }
         }
       }
-      // console.log('GET CUR ans', results_found_field)
+      // console.log('GET DIARY ans', results_found_field)
 
       // Если поле найдено и данные являются актуальными, то возвращаем
       if (!!results_found_field[val_key]) {
@@ -96,7 +95,7 @@ router.post("/update", (req, res, next) => {
     ELSE if < RETURN {code:1, time: null}
   */
 
-  console.log("UPDATE CUR req.body", req.body);
+  console.log("UPDATE DIARY req.body", req.body);
 
   var token_data = jwt.decode(req.headers.auth, config.secret, false, "HS256");
 
@@ -117,11 +116,11 @@ router.post("/update", (req, res, next) => {
   } else {
     res.send({ code: -1, time: null, message: "Фильтр данных не задан" });
   }
-  // console.log('UPDATE CUR update_fields', update_fields)
+  // console.log('UPDATE DIARY update_fields', update_fields)
 
-  db.get(db.users_database, db.users_collection, filter, get_fields)
+  db.get(db.users_database, db.diary_collection, filter, get_fields)
     .then((get_results) => {
-      // console.log('UPDATE CUR get_results', get_results)
+      // console.log('UPDATE DIARY get_results', get_results)
 
       // Достаём нужное поле по URL
       let urls = req.body.url.split(".");
@@ -132,7 +131,7 @@ router.post("/update", (req, res, next) => {
             get_result_field = get_result_field[urls[i]];
           }
         }
-      // console.log('UPDATE CUR get_result_field', get_result_field)
+      // console.log('UPDATE DIARY get_result_field', get_result_field)
 
       // Если поле найдено, то обновляем его
       if (!!get_result_field) {
@@ -141,7 +140,7 @@ router.post("/update", (req, res, next) => {
         if (get_result_field._T < req.body.time) {
           db.update(
             db.users_database,
-            db.users_collection,
+            db.diary_collection,
             filter,
             update_fields
           )
@@ -174,7 +173,7 @@ router.post("/update", (req, res, next) => {
       }
       // Если такого объекта или поля в базе нет, то создаём его
       else {
-        db.update(db.users_database, db.users_collection, filter, update_fields)
+        db.update(db.users_database, db.diary_collection, filter, update_fields)
           .then((results) => {
             if (!!results) {
               // Для динамической переавторизации при изменении email
@@ -208,7 +207,7 @@ router.post("/update", (req, res, next) => {
           // console.log('update_time_fields', update_time_fields)
           db.update(
             db.users_database,
-            db.users_collection,
+            db.diary_collection,
             filter,
             update_time_fields
           );
@@ -227,7 +226,7 @@ router.post("/remove", (req, res, next) => {
     }
   */
 
-  console.log("REMOVE CUR req.body", req.body);
+  console.log("REMOVE DIARY req.body", req.body);
 
   let token_data = jwt.decode(req.headers.auth, config.secret, false, "HS256");
 
@@ -241,9 +240,9 @@ router.post("/remove", (req, res, next) => {
     res.send({ code: -1, time: null, message: "Фильтр данных не задан" });
   }
 
-  db.get(db.users_database, db.users_collection, filter, get_fields)
+  db.get(db.users_database, db.diary_collection, filter, get_fields)
     .then((get_results) => {
-      // console.log('REMOVE CUR get_results', get_results)
+      // console.log('REMOVE DIARY get_results', get_results)
 
       // Достаём нужное поле по URL
       let urls = req.body.url.split(".");
@@ -254,11 +253,11 @@ router.post("/remove", (req, res, next) => {
             get_result_field = get_result_field[urls[i]];
           }
         }
-      // console.log('REMOVE CUR get_result_field', get_result_field)
+      // console.log('REMOVE DIARY get_result_field', get_result_field)
 
       // Если поле найдено, то обновляем его
       if (!!get_result_field) {
-        db.remove(db.users_database, db.users_collection, filter, remove_fields)
+        db.remove(db.users_database, db.diary_collection, filter, remove_fields)
           .then((results) => {
             if (!!results) {
               res.send({
@@ -289,7 +288,7 @@ router.post("/remove", (req, res, next) => {
 });
 
 // Fill profile diary random values
-router.post("/fill_diary", (req, res, next) => {
+router.post("/autofill", (req, res, next) => {
   /*
     req.body: {
       count: <Int number> // Количество сгенерированных записей для добавления
@@ -297,7 +296,7 @@ router.post("/fill_diary", (req, res, next) => {
     }
   */
 
-  console.log("FILL CUR req.body", req.body);
+  console.log("FILL DIARY req.body", req.body);
 
   var token_data = jwt.decode(req.headers.auth, config.secret, false, "HS256");
   var filter = { email: token_data.email };
@@ -321,9 +320,9 @@ router.post("/fill_diary", (req, res, next) => {
     });
   }
 
-  db.get(db.users_database, db.users_collection, filter, get_fields)
+  db.get(db.users_database, db.diary_collection, filter, get_fields)
     .then((get_results) => {
-      // console.log('FILL CUR get_results', get_results)
+      // console.log('FILL DIARY get_results', get_results)
 
       let history = unwrap(get_results[0]["history"]);
       let variables = unwrap(get_results[0]["variables"]);
@@ -340,7 +339,7 @@ router.post("/fill_diary", (req, res, next) => {
       let new_time = Date.now();
       for (let i = 1; i < Number(req.body.count) + 1; i++) {
         new_time -= Number(req.body.interval);
-        // console.log('FILL CUR new_time', new_time)
+        // console.log('FILL DIARY new_time', new_time)
         for (let hist_key in hist_keys_list) {
           // Достаём данные о переменной истории
           let variable = variables[hist_keys_list[hist_key]];
@@ -355,39 +354,16 @@ router.post("/fill_diary", (req, res, next) => {
             Math.random() * var_limit_sum + limit_min
           ).toFixed(0);
 
-          // console.log('variable', variable)
-          // console.log('var_limit_sum', var_limit_sum)
-          // console.log('new_hist_val', new_hist_val)
           history_addictions[hist_keys_list[hist_key]][new_time] = {
             value: Number(new_hist_val),
             time: new_time,
           };
         }
       }
-      // console.log('FILL CUR new history', history)
-
       res.send({
         items: history_addictions,
         time: Date.now(),
       });
-
-      // // Обновляем данные в БД
-      // let new_history = { history: wrap(history_addictions, Date.now()) }
-      // db
-      //   .update(db.users_database, db.users_collection, filter, new_history)
-      //   .then((results) => {
-      //     if (!!results) {
-      //       res.send({
-      //         message: "Данные обновлены",
-      //         time: Date.now()
-      //       });
-      //     } else {
-      //       const err = new Error('Данные не обновлены! Попробуйте ещё раз позже.');
-      //       err.status = 400;
-      //       next(err);
-      //     }
-      //   })
-      //   .catch((err) => { next(err); })
     })
     .catch((err) => {
       next(err);
