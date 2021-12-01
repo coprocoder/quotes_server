@@ -43,8 +43,8 @@ router.post("/create", async (req, res, next) => {
 
   var chat_id = req.body.chat_id;
   var users_dict = {};
-  for (let i in req.body.users) {
-    users_dict[chat_id++] = req.body.users[i];
+  for (let i in req.body.users_email_list) {
+    users_dict[chat_id++] = req.body.users_email_list[i];
   }
 
   // console.log("chat users", users_dict);
@@ -60,10 +60,8 @@ router.post("/create", async (req, res, next) => {
     .then((results) => {
       //console.log("new chat results", results);
 
-      // for (let id in req.body.users_email_list) {
-      for (let id in req.body.users) {
-        var filter = { "email._V": req.body.users[id].email };
-        // var filter = { "email._V": req.body.users_email_list[id] };
+      for (let id in req.body.users_email_list) {
+        var filter = { "email._V": req.body.users_email_list[id] };
         var get_fields = { "chats._V": 1 };
 
         // console.log('UPDATE CUR update_fields', update_fields)
@@ -73,9 +71,7 @@ router.post("/create", async (req, res, next) => {
           .then((get_results) => {
             // console.log("chat create get_results 1", get_results);
 
-            var filter = { "email._V": req.body.users[id].email };
-            // var filter = { "email._V": req.body.users_email_list[id] };
-            // console.log("chat create update filter", filter);
+            var filter = { "email._V": req.body.users_email_list[id] };
             let user_chats =
               get_results
                 .filter((item) => !!item.chats)
@@ -122,7 +118,7 @@ router.post("/create", async (req, res, next) => {
 router.post("/get", (req, res, next) => {
   console.log("chat get CUR req.body", req.body);
 
-  let filter = { "username._V": req.body.username };
+  let filter = { "email._V": req.body.email };
   let get_fields = { "chats._V": 1 };
 
   // Получение списка id чатов юзера
@@ -136,15 +132,60 @@ router.post("/get", (req, res, next) => {
       // Фильтрация чатов по юзеру (только те, в которые он добавлен)
       filter = { id: { $in: chats_id_list } };
       get_fields = {};
+
       // Получение чатов
       db.get(db.users_database, db.chats_collection, filter, get_fields)
-        .then((get_results) => {
-          // console.log("chat get get_results", get_results, typeof get_results);
+        .then(async (get_results) => {
+          console.log("chat get get_results", get_results, typeof get_results);
 
-          let chats_dict = {};
+          var chats_dict = {};
+
+          // Проходимся по найденным чатам
           for (let i in get_results) {
-            chats_dict[get_results[i].id] = get_results[i];
+            let chat = get_results[i];
+            console.log("chat", chat);
+
+            async function fillUsersInfoIntoChat() {
+              let users_info_dict = {};
+
+              // Дёргаем инфу о каждом юзере в чате
+              const promises = Object.keys(chat.users).map(
+                async (user_key, index) => {
+                  var filter = { "email._V": chat.users[user_key] };
+                  var get_fields = {
+                    username: 1,
+                    email: 1,
+                    personal: 1,
+                  };
+                  await db
+                    .get(
+                      db.users_database,
+                      db.users_collection,
+                      filter,
+                      get_fields
+                    )
+                    .then((get_results) => {
+                      delete get_results[0]._id;
+                      users_info_dict[user_key] = unwrap({
+                        [val_key]: get_results[0],
+                        [time_key]: null,
+                      });
+                    });
+                }
+              );
+              await Promise.all(promises);
+              console.log("CHAT filled chat", users_info_dict);
+
+              return users_info_dict;
+            }
+
+            // заполняем инфу о юзерах в чате
+            chat.users = await fillUsersInfoIntoChat();
+
+            console.log("CHAT chat with users", chat);
+            chats_dict[get_results[i].id] = chat;
           }
+
           res.send(chats_dict);
         })
         .catch((err) => {

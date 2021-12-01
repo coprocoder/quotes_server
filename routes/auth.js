@@ -66,6 +66,7 @@ router.post("/login", (req, res, next) => {
 
               res.json({
                 token: token,
+                email: user.email ? unwrap(user.email) : null,
                 username: user.username ? unwrap(user.username) : null,
                 personal: user.personal ? unwrap(user.personal) : null,
                 //user: payload
