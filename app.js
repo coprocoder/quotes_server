@@ -25,6 +25,7 @@ const messagingRouter = require("./routes/firebase/messaging");
 
 const profileRouter = require("./routes/user/profile");
 const diaryRouter = require("./routes/user/diary");
+const scheduleRouter = require("./routes/user/schedule");
 
 var app = express();
 app.use(cors());
@@ -141,6 +142,7 @@ app.use("/api/messaging", messagingRouter); // Справочники
 
 app.use("/api/profile", profileRouter); // Текущий пользователь
 app.use("/api/diary", diaryRouter); // Текущий пользователь
+app.use("/api/schedule", scheduleRouter); // Текущий пользователь
 
 /* ### === Error handlers block === */
 

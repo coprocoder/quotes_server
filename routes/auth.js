@@ -124,35 +124,12 @@ router.post("/signup", (req, res, next) => {
               message: "Пользователь с таким именем уже существует!",
             });
           } else {
-            // Собираем данные для регистрации
+            // === Личные данные пользователя ===
             let profile_data = {
               email: wrap(req.body.email, servertime),
               username: wrap(req.body.username, servertime),
             };
-            let diary_data = {
-              email: wrap(req.body.email, servertime),
-              diary: wrap(user_preset_config.diary, servertime),
-              history: wrap(
-                Object.assign(
-                  {},
-                  ...Object.keys(user_preset_config.variables).map((x) => ({
-                    [x]: {},
-                  }))
-                ),
-                servertime
-              ),
-              variables: wrap(
-                Object.assign(
-                  {},
-                  ...Object.keys(user_preset_config.variables).map((x) => ({
-                    [x]: user_preset_config.variables[x],
-                  }))
-                ),
-                servertime
-              ),
-            };
-
-            // Записываем данные в обычную БД
+            // Записываем данные в БД usersdb
             db.create(db.users_database, db.users_collection, profile_data)
               .then((results) => {
                 var new_user = results.ops[0];
@@ -175,7 +152,7 @@ router.post("/signup", (req, res, next) => {
                   password: conversion.createHash(req.body.password),
                   role: 1,
                 };
-                // Записываем пароль в секретную БД
+                // Записываем пароль в секретную БД securedb
                 db.create(db.secure_database, db.secure_collection, secure_data)
                   .then((results) => {
                     res.json({
@@ -190,10 +167,44 @@ router.post("/signup", (req, res, next) => {
                 next(err);
               });
 
-            // Записываем информацию о дневниках в БД
+            // === Дневники пользователя ===
+            let diary_data = {
+              email: wrap(req.body.email, servertime),
+              diary: wrap(user_preset_config.diary, servertime),
+              history: wrap(
+                Object.assign(
+                  {},
+                  ...Object.keys(user_preset_config.variables).map((x) => ({
+                    [x]: {},
+                  }))
+                ),
+                servertime
+              ),
+              variables: wrap(
+                Object.assign(
+                  {},
+                  ...Object.keys(user_preset_config.variables).map((x) => ({
+                    [x]: user_preset_config.variables[x],
+                  }))
+                ),
+                servertime
+              ),
+            };
             db.create(db.users_database, db.diary_collection, diary_data)
               .then((results) => {
-                console.log('Diary data was created')
+                console.log("Diary data was created");
+              })
+              .catch((err) => {
+                next(err);
+              });
+
+            // === События пользователя ===
+            let schedule_data = {
+              email: wrap(req.body.email, servertime),
+            };
+            db.create(db.users_database, db.schedule_collection, schedule_data)
+              .then((results) => {
+                console.log("Schedule data was created");
               })
               .catch((err) => {
                 next(err);

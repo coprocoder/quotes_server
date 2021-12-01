@@ -19,10 +19,10 @@ function createHashedFilename(filename) {
   file_ext = file_ext[file_ext.length - 1];
 
   let filename_hash = conversion.createHash(filename) + "." + file_ext;
-  filename_hash = filename_hash.replace("/", "").replace("\\", "");
-  console.log("hashed_filename", filename_hash);
+  // filename_hash.replace("/", "").replace("\\", "");
+  // console.log("hashed_filename", filename_hash);
 
-  return filename_hash;
+  return filename_hash.replace("/", "").replace("\\", "");
 }
 
 async function generateAndSaveImageMiniature(file, filename_hash) {
