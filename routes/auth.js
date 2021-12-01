@@ -190,7 +190,7 @@ router.post("/signup", (req, res, next) => {
                 servertime
               ),
             };
-            db.create(db.users_database, db.diary_collection, diary_data)
+            db.create(db.users_database, db.diaries_collection, diary_data)
               .then((results) => {
                 console.log("Diary data was created");
               })
@@ -202,9 +202,21 @@ router.post("/signup", (req, res, next) => {
             let schedule_data = {
               email: wrap(req.body.email, servertime),
             };
-            db.create(db.users_database, db.schedule_collection, schedule_data)
+            db.create(db.users_database, db.schedules_collection, schedule_data)
               .then((results) => {
                 console.log("Schedule data was created");
+              })
+              .catch((err) => {
+                next(err);
+              });
+
+            // === Медикаменты пользователя ===
+            let medicaments_data = {
+              email: wrap(req.body.email, servertime),
+            };
+            db.create(db.users_database, db.medicaments_collection, medicaments_data)
+              .then((results) => {
+                console.log("Medicaments data was created");
               })
               .catch((err) => {
                 next(err);

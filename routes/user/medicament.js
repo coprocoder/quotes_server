@@ -6,7 +6,6 @@ const config = require("../../config/config");
 const db = require("../../db/db");
 const { val_key, time_key, wrap, unwrap } = require("../../db/wrapper");
 
-
 /* === SELECT INFO  === */
 
 // Get existed user
@@ -20,19 +19,18 @@ router.post("/get", (req, res, next) => {
     ELSE if < then return {value:db_value, time: db_time}
   */
 
-  //console.log('GET req.session', req.session)
-  // console.log('GET CUR req.head.auth', req.headers.auth)
-  console.log("GET CUR req.body", req.body);
+  console.log("GET MEDICAMENTS req.body", req.body);
 
   //var filter = {'email.value': req.session.user.email};
-  var token_data = jwt.decode(req.headers.auth, config.secret, false, "HS256");
-  // console.log('GET CUR token_data', token_data)
-  var filter = { _id: token_data.id };
+  var token_data = jwt.
+  decode(req.headers.auth, config.secret, false, "HS256");
+  // console.log('GET MEDICAMENTS token_data', token_data)
+  var filter = { email: token_data.email };
   var fields = !!req.body.url ? { [req.body.url]: 1 } : {};
 
-  db.get(db.users_database, db.users_collection, filter, fields)
+  db.get(db.users_database, db.medicaments_collection, filter, fields)
     .then((results) => {
-      console.log('GET CUR results', results)
+      console.log('GET MEDICAMENTS results', results)
 
       // Достаём по url нужное вложенное поле из результата
       let results_found_field = results[0];
@@ -43,20 +41,15 @@ router.post("/get", (req, res, next) => {
         fields = { [req.body.url]: 1 };
         if (req.body.url.length > 0) {
           urls = req.body.url.split(".");
-          // console.log('GET CUR results_found_field', results_found_field)
-          // console.log('GET CUR urls', urls)
+          // console.log('GET MEDICAMENTS results_found_field', results_found_field)
+          // console.log('GET MEDICAMENTS urls', urls)
           for (i in urls) {
             if (results_found_field[urls[i]] != undefined)
               results_found_field = results_found_field[urls[i]];
-            // else
-            //   results_found_field = {
-            //     [val_key]: null,
-            //     [time_key]: null,
-            //   };
           }
         }
       }
-      console.log('GET CUR ans', results_found_field)
+      console.log('GET MEDICAMENTS ans', results_found_field)
 
       // Если поле найдено и данные являются актуальными, то возвращаем
       if (!!results_found_field[val_key]) {
@@ -97,7 +90,7 @@ router.post("/update", (req, res, next) => {
     ELSE if < RETURN {code:1, time: null}
   */
 
-  console.log("UPDATE CUR req.body", req.body);
+  console.log("UPDATE MEDICAMENTS req.body", req.body);
 
   var token_data = jwt.decode(req.headers.auth, config.secret, false, "HS256");
 
@@ -118,11 +111,11 @@ router.post("/update", (req, res, next) => {
   } else {
     res.send({ code: -1, time: null, message: "Фильтр данных не задан" });
   }
-  // console.log('UPDATE CUR update_fields', update_fields)
+  // console.log('UPDATE MEDICAMENTS update_fields', update_fields)
 
-  db.get(db.users_database, db.users_collection, filter, get_fields)
+  db.get(db.users_database, db.medicaments_collection, filter, get_fields)
     .then((get_results) => {
-      // console.log('UPDATE CUR get_results', get_results)
+      // console.log('UPDATE MEDICAMENTS get_results', get_results)
 
       // Достаём нужное поле по URL
       let urls = req.body.url.split(".");
@@ -133,7 +126,7 @@ router.post("/update", (req, res, next) => {
             get_result_field = get_result_field[urls[i]];
           }
         }
-      // console.log('UPDATE CUR get_result_field', get_result_field)
+      // console.log('UPDATE MEDICAMENTS get_result_field', get_result_field)
 
       // Если поле найдено, то обновляем его
       if (!!get_result_field) {
@@ -142,7 +135,7 @@ router.post("/update", (req, res, next) => {
         if (get_result_field._T < req.body.time) {
           db.update(
             db.users_database,
-            db.users_collection,
+            db.medicaments_collection,
             filter,
             update_fields
           )
@@ -175,7 +168,7 @@ router.post("/update", (req, res, next) => {
       }
       // Если такого объекта или поля в базе нет, то создаём его
       else {
-        db.update(db.users_database, db.users_collection, filter, update_fields)
+        db.update(db.users_database, db.medicaments_collection, filter, update_fields)
           .then((results) => {
             if (!!results) {
               // Для динамической переавторизации при изменении email
@@ -209,7 +202,7 @@ router.post("/update", (req, res, next) => {
           // console.log('update_time_fields', update_time_fields)
           db.update(
             db.users_database,
-            db.users_collection,
+            db.medicaments_collection,
             filter,
             update_time_fields
           );
@@ -228,7 +221,7 @@ router.post("/remove", (req, res, next) => {
     }
   */
 
-  console.log("REMOVE CUR req.body", req.body);
+  console.log("REMOVE MEDICAMENTS req.body", req.body);
 
   let token_data = jwt.decode(req.headers.auth, config.secret, false, "HS256");
 
@@ -242,9 +235,9 @@ router.post("/remove", (req, res, next) => {
     res.send({ code: -1, time: null, message: "Фильтр данных не задан" });
   }
 
-  db.get(db.users_database, db.users_collection, filter, get_fields)
+  db.get(db.users_database, db.medicaments_collection, filter, get_fields)
     .then((get_results) => {
-      // console.log('REMOVE CUR get_results', get_results)
+      // console.log('REMOVE MEDICAMENTS get_results', get_results)
 
       // Достаём нужное поле по URL
       let urls = req.body.url.split(".");
@@ -255,11 +248,11 @@ router.post("/remove", (req, res, next) => {
             get_result_field = get_result_field[urls[i]];
           }
         }
-      // console.log('REMOVE CUR get_result_field', get_result_field)
+      // console.log('REMOVE MEDICAMENTS get_result_field', get_result_field)
 
       // Если поле найдено, то обновляем его
       if (!!get_result_field) {
-        db.remove(db.users_database, db.users_collection, filter, remove_fields)
+        db.remove(db.users_database, db.medicaments_collection, filter, remove_fields)
           .then((results) => {
             if (!!results) {
               res.send({

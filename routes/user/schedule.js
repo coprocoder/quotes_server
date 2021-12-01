@@ -28,9 +28,9 @@ router.post("/get", (req, res, next) => {
   var filter = { email: token_data.email };
   var fields = !!req.body.url ? { [req.body.url]: 1 } : {};
 
-  db.get(db.users_database, db.schedule_collection, filter, fields)
+  db.get(db.users_database, db.schedules_collection, filter, fields)
     .then((results) => {
-      // console.log('GET SCHEDULE results', results)
+      console.log('GET SCHEDULE results', results)
 
       // Достаём по url нужное вложенное поле из результата
       let results_found_field = results[0];
@@ -49,7 +49,7 @@ router.post("/get", (req, res, next) => {
           }
         }
       }
-      // console.log('GET SCHEDULE ans', results_found_field)
+      console.log('GET SCHEDULE ans', results_found_field)
 
       // Если поле найдено и данные являются актуальными, то возвращаем
       if (!!results_found_field[val_key]) {
@@ -113,7 +113,7 @@ router.post("/update", (req, res, next) => {
   }
   // console.log('UPDATE SCHEDULE update_fields', update_fields)
 
-  db.get(db.users_database, db.schedule_collection, filter, get_fields)
+  db.get(db.users_database, db.schedules_collection, filter, get_fields)
     .then((get_results) => {
       // console.log('UPDATE SCHEDULE get_results', get_results)
 
@@ -135,7 +135,7 @@ router.post("/update", (req, res, next) => {
         if (get_result_field._T < req.body.time) {
           db.update(
             db.users_database,
-            db.schedule_collection,
+            db.schedules_collection,
             filter,
             update_fields
           )
@@ -168,7 +168,7 @@ router.post("/update", (req, res, next) => {
       }
       // Если такого объекта или поля в базе нет, то создаём его
       else {
-        db.update(db.users_database, db.schedule_collection, filter, update_fields)
+        db.update(db.users_database, db.schedules_collection, filter, update_fields)
           .then((results) => {
             if (!!results) {
               // Для динамической переавторизации при изменении email
@@ -202,7 +202,7 @@ router.post("/update", (req, res, next) => {
           // console.log('update_time_fields', update_time_fields)
           db.update(
             db.users_database,
-            db.schedule_collection,
+            db.schedules_collection,
             filter,
             update_time_fields
           );
@@ -235,7 +235,7 @@ router.post("/remove", (req, res, next) => {
     res.send({ code: -1, time: null, message: "Фильтр данных не задан" });
   }
 
-  db.get(db.users_database, db.schedule_collection, filter, get_fields)
+  db.get(db.users_database, db.schedules_collection, filter, get_fields)
     .then((get_results) => {
       // console.log('REMOVE SCHEDULE get_results', get_results)
 
@@ -252,7 +252,7 @@ router.post("/remove", (req, res, next) => {
 
       // Если поле найдено, то обновляем его
       if (!!get_result_field) {
-        db.remove(db.users_database, db.schedule_collection, filter, remove_fields)
+        db.remove(db.users_database, db.schedules_collection, filter, remove_fields)
           .then((results) => {
             if (!!results) {
               res.send({
