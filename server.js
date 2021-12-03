@@ -71,7 +71,7 @@ mongoClient.connect(function (err, client) {
 
   // получаем обработчики событий
   const registerMessageHandlers = require("./socket_handlers/messageHandlers.js");
-  const registerUserHandlers = require("./socket_handlers/userHandlers");
+  // const registerUserHandlers = require("./socket_handlers/userHandlers");
 
   // данная функция выполняется при подключении каждого сокета (обычно, один клиент = один сокет)
   const onConnection = (socket) => {
@@ -90,7 +90,7 @@ mongoClient.connect(function (err, client) {
     // регистрируем обработчики
     // обратите внимание на передаваемые аргументы
     registerMessageHandlers(io, socket);
-    registerUserHandlers(io, socket);
+    // registerUserHandlers(io, socket);
 
     // обрабатываем отключение сокета-пользователя
     socket.on("disconnect", () => {

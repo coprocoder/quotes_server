@@ -4,123 +4,132 @@ const db = require("../db/db");
 const { val_key, time_key, wrap, unwrap } = require("../db/wrapper");
 const ObjectID = require("mongodb").ObjectID;
 
-router.post("/create", async (req, res, next) => {
-  console.log("CHATS CREATE CUR req.body", req.body);
-
-  let filter = { "email._V": req.body.users_email_list[0] };
+function checkExistChat(users_email_list, next) {
+  let filter = { "email._V": users_email_list[0] };
   let get_fields = { "chats._V": 1 };
 
   // Получение списка id чатов собеседника
-  db.get(db.users_database, db.users_collection, filter, get_fields)
-    .then((user_chats) => {
-      let chats_id_list = (user_chats[0].chats && unwrap(user_chats[0].chats)) || [];
+  return new Promise((resolve, reject) => {
+    db.get(db.users_database, db.users_collection, filter, get_fields)
+      .then(async (user_chats) => {
+        let chats_id_list = (user_chats[0].chats && unwrap(user_chats[0].chats)) || [];
 
-      // Фильтрация чатов по юзеру (только те, в которые он добавлен)
-      let filter = { id: { $in: chats_id_list } };
-      let get_fields = { users: 1, id: 1 };
+        // Фильтрация чатов по юзеру (только те, в которые он добавлен)
+        let filter = { id: { $in: chats_id_list } };
+        let get_fields = { users: 1, id: 1 };
 
-      // Получение чатов собеседника
-      db.get(db.users_database, db.chats_collection, filter, get_fields)
-        .then((get_chats_results) => {
-          console.log("CHATS CREATE get_results", get_chats_results);
-          let existed_chat_id = -1;
+        // Получение чатов собеседника
+        db.get(db.users_database, db.chats_collection, filter, get_fields)
+          .then((get_chats_results) => {
+            console.log("CHATS CREATE get_results", get_chats_results);
+            let existed_chat_id = -1;
 
-          // Проходимся по найденным чатам
-          for (let i in get_chats_results) {
-            let chat = get_chats_results[i];
-            let chat_users_list = Object.values(chat.users);
+            // Проходимся по найденным чатам
+            for (let i in get_chats_results) {
+              let chat = get_chats_results[i];
+              let chat_users_list = Object.values(chat.users);
 
-            // Проверяем, существует ли уже чат с этими юзерами
-            if (
-              chat_users_list.length == 2 &&
-              req.body.users_email_list.length === chat_users_list.length &&
-              req.body.users_email_list.sort().every(function (value, index) {
-                return value === chat_users_list.sort()[index];
-              })
-            ) {
-              existed_chat_id = chat.id;
+              // Проверяем, существует ли уже чат с этими юзерами
+              if (
+                chat_users_list.length == 2 &&
+                users_email_list.length === chat_users_list.length &&
+                users_email_list.sort().every(function (value, index) {
+                  return value === chat_users_list.sort()[index];
+                })
+              ) {
+                existed_chat_id = chat.id;
+              }
             }
             console.log("CHATS CREATE existed_chat_id", existed_chat_id);
-          }
+            resolve(existed_chat_id);
+          })
+          .catch((err) => next(err));
+      })
+      .catch((err) => next(err));
+  });
+}
 
-          /*
-            Если чат с этими юзерами есть, записываем себе его id
-            Иначе создаем новый
-          */
-          if (existed_chat_id != -1) {
-            console.log("== CHAT EXIST ===");
-            res.send({
-              message: "Чат уже существует",
-              time: existed_chat_id,
-              exist: true,
-            });
-          } else {
-            console.log("== CHAT NEW ===");
-            var chat_id = req.body.chat_id;
-            var users_dict = {};
-            for (let i in req.body.users_email_list) {
-              users_dict[chat_id++] = req.body.users_email_list[i];
-            }
+router.post("/create", async (req, res, next) => {
+  console.log("CHATS CREATE CUR req.body", req.body);
 
-            // console.log("chat users", users_dict);
-            let chat_item = {
-              id: req.body.chat_id,
-              messages: {},
-              users: users_dict,
-            };
-            // console.log("chat chat_item", chat_item);
+  // Проверяем наличие такого чата, где есть только эти юзеры
+  let existed_chat_id = await checkExistChat(req.body.users_email_list, next);
+  console.log("CHATS CREATE existed_chat_id on create", existed_chat_id);
 
-            // Создаём чат
-            db.create(db.users_database, db.chats_collection, chat_item)
-              .then((results) => {
-                //console.log("new chat results", results);
+  /*
+    Если чат с этими юзерами есть, записываем себе его id
+    Иначе создаем новый
+  */
+  if (existed_chat_id != -1) {
+    console.log("== CHAT EXIST ===");
+    res.send({
+      message: "Чат уже существует",
+      time: existed_chat_id,
+      exist: true,
+    });
+  } else {
+    console.log("== CHAT NEW ===");
+    var chat_id = req.body.chat_id;
+    var users_dict = {};
+    for (let i in req.body.users_email_list) {
+      users_dict[chat_id++] = req.body.users_email_list[i];
+    }
 
-                for (let id in req.body.users_email_list) {
-                  var filter = { "email._V": req.body.users_email_list[id] };
-                  var get_fields = { "chats._V": 1 };
+    // console.log("chat users", users_dict);
+    let chat_item = {
+      id: req.body.chat_id,
+      messages: {},
+      users: users_dict,
+    };
+    // console.log("chat chat_item", chat_item);
 
-                  // console.log('UPDATE CUR update_fields', update_fields)
+    // Создаём чат
+    db.create(db.users_database, db.chats_collection, chat_item)
+      .then((results) => {
+        //console.log("new chat results", results);
 
-                  // Запись чата юзеру
-                  db.get(db.users_database, db.users_collection, filter, get_fields)
-                    .then((get_results) => {
-                      // console.log("chat create get_results 1", get_results);
+        for (let id in req.body.users_email_list) {
+          var filter = { "email._V": req.body.users_email_list[id] };
+          var get_fields = { "chats._V": 1 };
 
-                      var filter = {
-                        "email._V": req.body.users_email_list[id],
-                      };
-                      let user_chats = get_results.filter((item) => !!item.chats).map((item) => item.chats._V)[0] || [];
-                      if (user_chats.indexOf(req.body.chat_id) === -1) user_chats.push(req.body.chat_id);
+          // console.log('UPDATE CUR update_fields', update_fields)
 
-                      var update_fields = {
-                        ["chats._V"]: user_chats,
-                        ["chats._T"]: req.body.chat_id,
-                      };
-                      db.update(db.users_database, db.users_collection, filter, update_fields)
-                        .then((results) => {
-                          if (!!results) {
-                            res.send({
-                              message: "Данные обновлены",
-                              time: req.body.chat_id,
-                              exist: false,
-                            });
-                          } else {
-                            const err = new Error("Данные не обновлены!");
-                            err.status = 400;
-                            next(err);
-                          }
-                        })
-                        .catch((err) => next(err));
-                    })
-                    .catch((err) => next(err));
-                }
-              })
-              .catch((err) => next(err));
-          }
-        })
-        .catch((err) => next(err));
-    })
-    .catch((err) => next(err));
+          // Запись чата юзеру
+          db.get(db.users_database, db.users_collection, filter, get_fields)
+            .then((get_results) => {
+              // console.log("chat create get_results 1", get_results);
+
+              var filter = {
+                "email._V": req.body.users_email_list[id],
+              };
+              let user_chats = get_results.filter((item) => !!item.chats).map((item) => item.chats._V)[0] || [];
+              if (user_chats.indexOf(req.body.chat_id) === -1) user_chats.push(req.body.chat_id);
+
+              var update_fields = {
+                ["chats._V"]: user_chats,
+                ["chats._T"]: req.body.chat_id,
+              };
+              db.update(db.users_database, db.users_collection, filter, update_fields)
+                .then((results) => {
+                  if (!!results) {
+                    res.send({
+                      message: "Данные обновлены",
+                      time: req.body.chat_id,
+                      exist: false,
+                    });
+                  } else {
+                    const err = new Error("Данные не обновлены!");
+                    err.status = 400;
+                    next(err);
+                  }
+                })
+                .catch((err) => next(err));
+            })
+            .catch((err) => next(err));
+        }
+      })
+      .catch((err) => next(err));
+  }
 });
 
 router.post("/get", (req, res, next) => {
