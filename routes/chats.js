@@ -13,8 +13,7 @@ router.post("/create", async (req, res, next) => {
   // Получение списка id чатов собеседника
   db.get(db.users_database, db.users_collection, filter, get_fields)
     .then((user_chats) => {
-      let chats_id_list =
-        (user_chats[0].chats && unwrap(user_chats[0].chats)) || [];
+      let chats_id_list = (user_chats[0].chats && unwrap(user_chats[0].chats)) || [];
 
       // Фильтрация чатов по юзеру (только те, в которые он добавлен)
       let filter = { id: { $in: chats_id_list } };
@@ -49,14 +48,14 @@ router.post("/create", async (req, res, next) => {
             Иначе создаем новый
           */
           if (existed_chat_id != -1) {
-            console.log('== CHAT EXIST ===');
+            console.log("== CHAT EXIST ===");
             res.send({
               message: "Чат уже существует",
               time: existed_chat_id,
               exist: true,
             });
           } else {
-            console.log('== CHAT NEW ===');
+            console.log("== CHAT NEW ===");
             var chat_id = req.body.chat_id;
             var users_dict = {};
             for (let i in req.body.users_email_list) {
@@ -83,35 +82,21 @@ router.post("/create", async (req, res, next) => {
                   // console.log('UPDATE CUR update_fields', update_fields)
 
                   // Запись чата юзеру
-                  db.get(
-                    db.users_database,
-                    db.users_collection,
-                    filter,
-                    get_fields
-                  )
+                  db.get(db.users_database, db.users_collection, filter, get_fields)
                     .then((get_results) => {
                       // console.log("chat create get_results 1", get_results);
 
                       var filter = {
                         "email._V": req.body.users_email_list[id],
                       };
-                      let user_chats =
-                        get_results
-                          .filter((item) => !!item.chats)
-                          .map((item) => item.chats._V)[0] || [];
-                      if (user_chats.indexOf(req.body.chat_id) === -1)
-                        user_chats.push(req.body.chat_id);
+                      let user_chats = get_results.filter((item) => !!item.chats).map((item) => item.chats._V)[0] || [];
+                      if (user_chats.indexOf(req.body.chat_id) === -1) user_chats.push(req.body.chat_id);
 
                       var update_fields = {
                         ["chats._V"]: user_chats,
                         ["chats._T"]: req.body.chat_id,
                       };
-                      db.update(
-                        db.users_database,
-                        db.users_collection,
-                        filter,
-                        update_fields
-                      )
+                      db.update(db.users_database, db.users_collection, filter, update_fields)
                         .then((results) => {
                           if (!!results) {
                             res.send({
@@ -125,27 +110,17 @@ router.post("/create", async (req, res, next) => {
                             next(err);
                           }
                         })
-                        .catch((err) => {
-                          next(err);
-                        });
+                        .catch((err) => next(err));
                     })
-                    .catch((err) => {
-                      next(err);
-                    });
+                    .catch((err) => next(err));
                 }
               })
-              .catch((err) => {
-                next(err);
-              });
+              .catch((err) => next(err));
           }
         })
-        .catch((err) => {
-          next(err);
-        });
+        .catch((err) => next(err));
     })
-    .catch((err) => {
-      next(err);
-    });
+    .catch((err) => next(err));
 });
 
 router.post("/get", (req, res, next) => {
@@ -158,8 +133,7 @@ router.post("/get", (req, res, next) => {
   db.get(db.users_database, db.users_collection, filter, get_fields)
     .then((user_chats) => {
       // console.log("user_chats", user_chats);
-      let chats_id_list =
-        (user_chats[0].chats && unwrap(user_chats[0].chats)) || [];
+      let chats_id_list = (user_chats[0].chats && unwrap(user_chats[0].chats)) || [];
       // console.log("chats_id_list", chats_id_list);
 
       // Фильтрация чатов по юзеру (только те, в которые он добавлен)
@@ -182,30 +156,21 @@ router.post("/get", (req, res, next) => {
               let users_info_dict = {};
 
               // Дёргаем инфу о каждом юзере в чате
-              const promises = Object.keys(chat.users).map(
-                async (user_key, index) => {
-                  var filter = { "email._V": chat.users[user_key] };
-                  var get_fields = {
-                    username: 1,
-                    email: 1,
-                    personal: 1,
-                  };
-                  await db
-                    .get(
-                      db.users_database,
-                      db.users_collection,
-                      filter,
-                      get_fields
-                    )
-                    .then((get_results) => {
-                      delete get_results[0]._id;
-                      users_info_dict[user_key] = unwrap({
-                        [val_key]: get_results[0],
-                        [time_key]: null,
-                      });
-                    });
-                }
-              );
+              const promises = Object.keys(chat.users).map(async (user_key, index) => {
+                var filter = { "email._V": chat.users[user_key] };
+                var get_fields = {
+                  username: 1,
+                  email: 1,
+                  personal: 1,
+                };
+                await db.get(db.users_database, db.users_collection, filter, get_fields).then((get_results) => {
+                  delete get_results[0]._id;
+                  users_info_dict[user_key] = unwrap({
+                    [val_key]: get_results[0],
+                    [time_key]: null,
+                  });
+                });
+              });
               await Promise.all(promises);
               console.log("CHAT filled chat", users_info_dict);
 
