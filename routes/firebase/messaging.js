@@ -12,9 +12,6 @@ router.post("/test", async (req, res) => {
   console.log("firebase_test headers", req.headers);
 
   var fb_log_file = fs.createWriteStream(__dirname + "/firebase.log", { flags: "a" });
-  // let client_ip = (req.headers['x-forwarded-for'] || '').split(',')[0] || req.socket.remoteAddress || null
-  // console.log('client_ip', client_ip, req.ip)
-
   let log_obj = new Date().toLocaleString() + " " + req.ip + " " + JSON.stringify(req.body);
   fb_log_file.write(log_obj + "\n");
 
@@ -133,8 +130,9 @@ router.post("/register_token", (req, res, next) => {
         .then((get_secure_results) => {
           console.log("firebase register_token get_secure_results", get_secure_results);
 
-          let client_ip = req.ip.replace(/\./g, ":");
-          let new_token = { [req.body.device + "-" + client_ip]: req.body.token };
+          // let client_ip = req.ip.replace(/\./g, ":");
+          // let new_token = { [req.body.device + "-" + client_ip]: req.body.token };
+          let new_token = { [req.body.device]: req.body.token };
           console.log("firebase register_token new_token", new_token);
 
           // Достаём нужное поле по URL
