@@ -38,13 +38,10 @@ router.post("/register_token", (req, res, next) => {
   // Ищем юзера с email из jwt_token
   db.get(db.users_database, db.users_collection, filter_user, get_user_fields)
     .then((get_users_results) => {
-      console.log("register_token get_users_results", get_users_results);
-
       // Достаём нужное поле по URL
       let update_token_field = {
         fb_token: Object.assign({}, get_users_results[0].fb_token, new_token),
       };
-      console.log("register_token update_token_field", update_token_field);
 
       db.update(db.users_database, db.users_collection, filter_user, update_token_field)
         .then((results) => {
