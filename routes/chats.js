@@ -1,8 +1,8 @@
 const express = require("express");
 const router = express.Router();
 const db = require("../db/db");
+// const messaging = require("../routes/firebase/firebase_conf");
 const { val_key, time_key, wrap, unwrap } = require("../db/wrapper");
-const ObjectID = require("mongodb").ObjectID;
 
 function checkExistChat(users_email_list, next) {
   let filter = { "email._V": users_email_list[0] };
@@ -49,6 +49,49 @@ function checkExistChat(users_email_list, next) {
   });
 }
 
+// async function addChatOnDevices(chat_id, users_email_list) {
+//   console.log("addChatOnDevices", chat_id, users_email_list);
+//   for (let i in users_email_list) {
+//     console.log("addChatOnDevices user email", users_email_list[i]);
+
+//     let filter_user = { "email._V": users_email_list[i] };
+//     let get_user_fields = { ["fb_token"]: 1 };
+
+//     // Ищем юзера с email из jwt_token
+//     db.get(db.users_database, db.users_collection, filter_user, get_user_fields).then((get_users_results) => {
+//       console.log("addChatOnDevices user data", get_users_results[0]);
+
+//       var registrationTokens = Object.values(get_users_results[0].fb_token);
+
+//       let notify_msg = {
+//         notification: {
+//           title: "Новый чат",
+//           body: "111",
+//         },
+//         data: {
+//           type: "new_chat",
+//           chat_id: chat_id,
+//         },
+//       };
+
+//       registrationTokens.forEach(async (token) => {
+//         let msg = { ...notify_msg, token: token };
+//         console.log("addChatOnDevices message", msg);
+//         await messaging
+//           .send(msg)
+//           .then((response) => {
+//             console.log("Succesfully sent message:", response);
+//           })
+//           .catch((error) => {
+//             console.log("Error sending message:", error);
+//           });
+//       });
+
+//       return res.send({}).status(200);
+//     });
+//   }
+// }
+
 router.post("/create", async (req, res, next) => {
   console.log("CHATS CREATE CUR req.body", req.body);
 
@@ -60,7 +103,7 @@ router.post("/create", async (req, res, next) => {
     Если чат с этими юзерами есть, записываем себе его id
     Иначе создаем новый
   */
-  if (existed_chat_id != -1) {
+  if (existed_chat_id == -1) {
     console.log("== CHAT EXIST ===");
     res.send({
       message: "Чат уже существует",
@@ -69,6 +112,8 @@ router.post("/create", async (req, res, next) => {
     });
   } else {
     console.log("== CHAT NEW ===");
+    // await addChatOnDevices(req.body.chat_id, req.body.users_email_list);
+
     var chat_id = req.body.chat_id;
     var users_dict = {};
     for (let i in req.body.users_email_list) {
@@ -152,14 +197,14 @@ router.post("/get", (req, res, next) => {
       // Получение чатов
       db.get(db.users_database, db.chats_collection, filter, get_fields)
         .then(async (get_results) => {
-          console.log("chat get get_results", get_results, typeof get_results);
+          // console.log("chat get get_results", get_results, typeof get_results);
 
           var chats_dict = {};
 
           // Проходимся по найденным чатам
           for (let i in get_results) {
             let chat = get_results[i];
-            console.log("chat", chat);
+            // console.log("chat", chat);
 
             async function fillUsersInfoIntoChat() {
               let users_info_dict = {};
@@ -181,7 +226,7 @@ router.post("/get", (req, res, next) => {
                 });
               });
               await Promise.all(promises);
-              console.log("CHAT filled chat", users_info_dict);
+              // console.log("CHAT filled chat", users_info_dict);
 
               return users_info_dict;
             }
@@ -189,7 +234,7 @@ router.post("/get", (req, res, next) => {
             // заполняем инфу о юзерах в чате
             chat.users = await fillUsersInfoIntoChat();
 
-            console.log("CHAT chat with users", chat);
+            // console.log("CHAT chat with users", chat);
             chats_dict[get_results[i].id] = chat;
           }
 
