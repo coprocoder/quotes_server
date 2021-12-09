@@ -3,40 +3,53 @@ const messaging = require("../routes/firebase/firebase_conf");
 const { val_key, time_key, wrap, unwrap } = require("../db/wrapper");
 
 async function sendNotification(chatId, message) {
+  console.log("sendNotification message", message);
+
+  // Достаём инфу об отправителе сообщения
+  var filter_sender = { "email._V": message.sender };
+  var fields_sender = { username: 1, personal: 1 };
+  let sender = await db.get(db.users_database, db.users_collection, filter_sender, fields_sender);
+  sender = sender[0];
+
+  let sender_username = (!!sender.username && unwrap(sender.username)) || "";
+  let sender_personal = (!!sender.personal && unwrap(sender.personal)) || {};
+  let sender_fio =
+    sender_personal.firstName && sender_personal.lastName
+      ? sender_personal.firstName + " " + sender_personal.lastName
+      : null;
+
+  // Формируем сообщение для уведомления
+  let notify_msg = {
+    notification: {
+      title: sender_fio || sender_username,
+      body: message.content.text || "Вложение",
+    },
+    data: {
+      type: "new_message",
+    },
+  };
+  console.log("sendNotification notify_msg", notify_msg);
+
+  // Достаем список юзеров в чате (email)
   var filter_chat = { id: Number(chatId) };
   var fields_chat = { users: 1 };
   let chat_users = await db.get(db.users_database, db.chats_collection, filter_chat, fields_chat);
   chat_users = chat_users[0].users;
 
+  // Отправляем каждому в чате
   for (let i in chat_users) {
     console.log("msg", chat_users[i], message);
 
     if (chat_users[i] !== message.sender) {
       let filter_user = { "email._V": chat_users[i] };
-      let get_user_fields = { ["fb_token"]: 1, username: 1, personal: 1 };
+      let get_user_fields = { ["fb_token"]: 1 };
 
       // Ищем юзера с email из jwt_token
       db.get(db.users_database, db.users_collection, filter_user, get_user_fields).then((get_users_results) => {
         console.log("chat user", get_users_results[0]);
 
         var registrationTokens = Object.values(get_users_results[0].fb_token);
-        let username = !!get_users_results[0].username && unwrap(get_users_results[0].username);
-        let personal = !!get_users_results[0].personal && unwrap(get_users_results[0].personal);
-
-        let fio;
-        if (personal) fio = personal.firstName + " " + personal.lastName;
-
         console.log("registrationTokens", registrationTokens);
-
-        let notify_msg = {
-          notification: {
-            title: fio || username,
-            body: message.content.text || "Вложение",
-          },
-          data: {
-            type: "new_message",
-          },
-        };
 
         registrationTokens.forEach((token) => {
           let msg = { ...notify_msg, token: token };
