@@ -28,7 +28,6 @@ async function sendNotification(chatId, message) {
       type: "new_message",
     },
   };
-  console.log("sendNotification notify_msg", notify_msg);
 
   // Достаем список юзеров в чате (email)
   var filter_chat = { id: Number(chatId) };
@@ -43,14 +42,8 @@ async function sendNotification(chatId, message) {
     if (chat_users[i] !== message.sender) {
       let filter_user = { "email._V": chat_users[i] };
       let get_user_fields = { ["fb_token"]: 1 };
-
-      // Ищем юзера с email из jwt_token
       db.get(db.users_database, db.users_collection, filter_user, get_user_fields).then((get_users_results) => {
-        console.log("chat user", get_users_results[0]);
-
         var registrationTokens = Object.values(get_users_results[0].fb_token);
-        console.log("registrationTokens", registrationTokens);
-
         registrationTokens.forEach((token) => {
           let msg = { ...notify_msg, token: token };
           console.log("sendNotification message", msg);

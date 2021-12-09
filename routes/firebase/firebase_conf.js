@@ -8,5 +8,3 @@ const app = admin.initializeApp(firebaseConfig);
 const messaging = app.messaging();
 
 module.exports = messaging;
-
-// return app.delete();

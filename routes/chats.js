@@ -1,7 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const db = require("../db/db");
-// const messaging = require("../routes/firebase/firebase_conf");
+const messaging = require("./firebase/firebase_conf");
 const { val_key, time_key, wrap, unwrap } = require("../db/wrapper");
 
 function checkExistChat(users_email_list, next) {
@@ -49,51 +49,52 @@ function checkExistChat(users_email_list, next) {
   });
 }
 
-// async function addChatOnDevices(chat_id, users_email_list) {
-//   console.log("addChatOnDevices", chat_id, users_email_list);
-//   for (let i in users_email_list) {
-//     console.log("addChatOnDevices user email", users_email_list[i]);
+async function addChatOnDevices(chat_id, users_email_list) {
+  console.log("addChatOnDevices", chat_id, users_email_list);
 
-//     let filter_user = { "email._V": users_email_list[i] };
-//     let get_user_fields = { ["fb_token"]: 1 };
+  let notify_msg = {
+    // notification: {
+    //   title: "Новый чат",
+    //   body: "111",
+    // },
+    data: {
+      type: "new_chat",
+      chat_id: String(chat_id),
+    },
+  };
 
-//     // Ищем юзера с email из jwt_token
-//     db.get(db.users_database, db.users_collection, filter_user, get_user_fields).then((get_users_results) => {
-//       console.log("addChatOnDevices user data", get_users_results[0]);
+  for (let i in users_email_list) {
+    console.log("addChatOnDevices user email", users_email_list[i]);
 
-//       var registrationTokens = Object.values(get_users_results[0].fb_token);
+    let filter_user = { "email._V": users_email_list[i] };
+    let get_user_fields = { ["fb_token"]: 1 };
+    db.get(db.users_database, db.users_collection, filter_user, get_user_fields).then((get_users_results) => {
+      console.log("addChatOnDevices user data", get_users_results[0]);
 
-//       let notify_msg = {
-//         notification: {
-//           title: "Новый чат",
-//           body: "111",
-//         },
-//         data: {
-//           type: "new_chat",
-//           chat_id: chat_id,
-//         },
-//       };
+      var registrationTokens = Object.values(get_users_results[0].fb_token);
+      registrationTokens.forEach(async (token) => {
+        let msg = { ...notify_msg, token: token };
+        console.log("addChatOnDevices message", msg);
+        messaging
+          .send(msg)
+          .then((response) => {
+            console.log("Succesfully sent message:", response);
+          })
+          .catch((error) => {
+            console.log("Error sending message:", error);
+          });
+        console.log("addChatOnDevices message 2");
 
-//       registrationTokens.forEach(async (token) => {
-//         let msg = { ...notify_msg, token: token };
-//         console.log("addChatOnDevices message", msg);
-//         await messaging
-//           .send(msg)
-//           .then((response) => {
-//             console.log("Succesfully sent message:", response);
-//           })
-//           .catch((error) => {
-//             console.log("Error sending message:", error);
-//           });
-//       });
-
-//       return res.send({}).status(200);
-//     });
-//   }
-// }
+        return res.send({}).status(200);
+      });
+    });
+  }
+}
 
 router.post("/create", async (req, res, next) => {
   console.log("CHATS CREATE CUR req.body", req.body);
+
+  addChatOnDevices(req.body.chat_id, req.body.users_email_list);
 
   // Проверяем наличие такого чата, где есть только эти юзеры
   let existed_chat_id = await checkExistChat(req.body.users_email_list, next);
@@ -112,7 +113,6 @@ router.post("/create", async (req, res, next) => {
     });
   } else {
     console.log("== CHAT NEW ===");
-    // await addChatOnDevices(req.body.chat_id, req.body.users_email_list);
 
     var chat_id = req.body.chat_id;
     var users_dict = {};
