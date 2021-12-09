@@ -103,7 +103,7 @@ router.post("/create", async (req, res, next) => {
     Если чат с этими юзерами есть, записываем себе его id
     Иначе создаем новый
   */
-  if (existed_chat_id == -1) {
+  if (existed_chat_id != -1) {
     console.log("== CHAT EXIST ===");
     res.send({
       message: "Чат уже существует",

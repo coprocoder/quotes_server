@@ -17,12 +17,16 @@ async function sendNotification(chatId, message) {
 
       // Ищем юзера с email из jwt_token
       db.get(db.users_database, db.users_collection, filter_user, get_user_fields).then((get_users_results) => {
-        // console.log("chat user", get_users_results[0]);
+        console.log("chat user", get_users_results[0]);
 
         var registrationTokens = Object.values(get_users_results[0].fb_token);
-        let username = unwrap(get_users_results[0].username);
-        let personal = unwrap(get_users_results[0].personal);
-        let fio = personal.firstName + " " + personal.lastName;
+        let username = !!get_users_results[0].username && unwrap(get_users_results[0].username);
+        let personal = !!get_users_results[0].personal && unwrap(get_users_results[0].personal);
+
+        let fio;
+        if (personal) fio = personal.firstName + " " + personal.lastName;
+
+        console.log("registrationTokens", registrationTokens);
 
         let notify_msg = {
           notification: {
