@@ -12,7 +12,7 @@ function checkExistChat(users_email_list, next) {
   return new Promise((resolve, reject) => {
     db.get(db.users_database, db.users_collection, filter, get_fields)
       .then(async (user_chats) => {
-        let chats_id_list = (user_chats[0].chats && unwrap(user_chats[0].chats)) || [];
+        let chats_id_list = (user_chats[0].chats && Object.values(unwrap(user_chats[0].chats))) || [];
 
         // Фильтрация чатов по юзеру (только те, в которые он добавлен)
         let filter = { id: { $in: chats_id_list } };
@@ -53,10 +53,6 @@ async function addChatOnDevices(chat_id, users_email_list) {
   console.log("addChatOnDevices", chat_id, users_email_list);
 
   let notify_msg = {
-    // notification: {
-    //   title: "Новый чат",
-    //   body: "111",
-    // },
     data: {
       type: "new_chat",
       chat_id: String(chat_id),
@@ -144,11 +140,10 @@ router.post("/create", async (req, res, next) => {
             .then((get_results) => {
               // console.log("chat create get_results 1", get_results);
 
-              var filter = {
-                "email._V": req.body.users_email_list[id],
-              };
-              let user_chats = get_results.filter((item) => !!item.chats).map((item) => item.chats._V)[0] || [];
-              if (user_chats.indexOf(req.body.chat_id) === -1) user_chats.push(req.body.chat_id);
+              var filter = { "email._V": req.body.users_email_list[id] };
+              let user_chats = get_results.filter((item) => !!item.chats).map((item) => item.chats._V)[0] || {};
+              if (Object.values(user_chats).indexOf(req.body.chat_id) === -1)
+                user_chats[req.body.chat_id] = wrap(req.body.chat_id, req.body.chat_id);
 
               var update_fields = {
                 ["chats._V"]: user_chats,
@@ -186,9 +181,9 @@ router.post("/get", (req, res, next) => {
   // Получение списка id чатов юзера
   db.get(db.users_database, db.users_collection, filter, get_fields)
     .then((user_chats) => {
-      // console.log("user_chats", user_chats);
-      let chats_id_list = (user_chats[0].chats && unwrap(user_chats[0].chats)) || [];
-      // console.log("chats_id_list", chats_id_list);
+      console.log("user_chats", user_chats);
+      let chats_id_list = (user_chats[0].chats && Object.values(unwrap(user_chats[0].chats))) || [];
+      console.log("chats_id_list", chats_id_list);
 
       // Фильтрация чатов по юзеру (только те, в которые он добавлен)
       filter = { id: { $in: chats_id_list } };
