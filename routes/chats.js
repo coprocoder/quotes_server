@@ -53,6 +53,10 @@ async function addChatOnDevices(chat_id, users_email_list) {
   console.log("addChatOnDevices", chat_id, users_email_list);
 
   let notify_msg = {
+    notification: {
+      title: "Новый чат",
+      body: "",
+    },
     data: {
       type: "new_chat",
       chat_id: String(chat_id),
