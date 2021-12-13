@@ -106,13 +106,13 @@ async function newChatMessageNotification(chatId, message) {
     android: {
       priority: "normal",
       notification: {
-        tag: "new_chat", // Для показа только последнего сообщения
+        tag: "new_message", // Для показа только последнего сообщения
       },
     },
     apns: {
       headers: {
         "apns-priority": "5",
-        "apns-collapse-id": "new_chat", // Для показа только последнего сообщения
+        "apns-collapse-id": "new_message", // Для показа только последнего сообщения
       },
     },
     webpush: {
