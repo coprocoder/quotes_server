@@ -27,6 +27,23 @@ async function newChatNotification(chat_id, users_email_list) {
       type: "new_chat",
       chat_id: String(chat_id),
     },
+    android: {
+      priority: "normal",
+      notification: {
+        tag: "new_chat", // Для показа только последнего сообщения
+      },
+    },
+    apns: {
+      headers: {
+        "apns-priority": "5",
+        "apns-collapse-id": "new_chat", // Для показа только последнего сообщения
+      },
+    },
+    webpush: {
+      headers: {
+        Urgency: "normal",
+      },
+    },
   };
 
   for (let i in users_email_list) {
@@ -85,6 +102,23 @@ async function newChatMessageNotification(chatId, message) {
     },
     data: {
       type: "new_message",
+    },
+    android: {
+      priority: "normal",
+      notification: {
+        tag: "new_chat", // Для показа только последнего сообщения
+      },
+    },
+    apns: {
+      headers: {
+        "apns-priority": "5",
+        "apns-collapse-id": "new_chat", // Для показа только последнего сообщения
+      },
+    },
+    webpush: {
+      headers: {
+        Urgency: "normal",
+      },
     },
   };
   console.log("sendNotification msg", notify_msg);
