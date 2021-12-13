@@ -21,10 +21,7 @@ router.post("/login", (req, res, next) => {
   */
   console.log("login req.body", req.body);
   var filter = {
-    $or: [
-      { ["username." + val_key]: req.body.email },
-      { ["email." + val_key]: req.body.email },
-    ],
+    $or: [{ ["username." + val_key]: req.body.email }, { ["email." + val_key]: req.body.email }],
   };
   var fields = {};
 
@@ -40,12 +37,7 @@ router.post("/login", (req, res, next) => {
         db.get(db.secure_database, db.secure_collection, filter, fields)
           .then((secure_results) => {
             console.log("secure_results[0]", secure_results[0]);
-            if (
-              conversion.isValidPassword(
-                req.body.password,
-                secure_results[0].password
-              )
-            ) {
+            if (conversion.isValidPassword(req.body.password, secure_results[0].password)) {
               // Данные внутри токена
               let payload = {
                 id: user._id,
@@ -158,6 +150,9 @@ router.post("/signup", (req, res, next) => {
                   .then((results) => {
                     res.json({
                       token: token,
+                      email: new_user.email,
+                      username: new_user.username,
+                      personal: null,
                     });
                   })
                   .catch((err) => {
