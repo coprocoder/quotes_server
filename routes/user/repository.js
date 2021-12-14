@@ -6,23 +6,19 @@ const { val_key, time_key, wrap, unwrap } = require("../../db/wrapper");
 
 module.exports.get = function (req, database, collection, next) {
   /*
-      req.body ex: {
-        "url":"field1.subfield",
-        "time":"time"
-      }
-      IF client time == server time return {value:null, time:null}
-      ELSE if < then return {value:db_value, time: db_time}
-    */
+    req.body ex: {
+      "url":"field1.subfield",
+      "time":"time"
+    }
+    IF client time == server time return {value:null, time:null}
+    ELSE if < then return {value:db_value, time: db_time}
+  */
 
   console.log("GET  req.body", req.body, database, collection);
 
   var token_data = jwt.decode(req.headers.auth, config.secret, false, "HS256");
   var filter = { email: token_data.email };
   var fields = !!req.body.url ? { [req.body.url]: 1 } : {};
-
-  //   console.log("GET  token_data", token_data);
-  //   console.log("GET  filter", filter);
-  //   console.log("GET  fields", fields);
 
   return new Promise((resolve, reject) => {
     db.get(database, collection, filter, fields)
@@ -34,28 +30,30 @@ module.exports.get = function (req, database, collection, next) {
         let urls;
 
         // Проход по объекту юзера поиска нужного поля
-        if (!!req.body.url) {
-          fields = { [req.body.url]: 1 };
-          if (req.body.url.length > 0) {
-            urls = req.body.url.split(".");
-            for (i in urls) {
-              if (results_found_field[urls[i]] != undefined)
-                results_found_field = results_found_field[urls[i]];
+        if (results_found_field) {
+          if (!!req.body.url) {
+            fields = { [req.body.url]: 1 };
+            if (req.body.url.length > 0) {
+              urls = req.body.url.split(".");
+              for (i in urls) {
+                if (results_found_field[urls[i]] != undefined) results_found_field = results_found_field[urls[i]];
+              }
             }
           }
-        }
-        console.log("GET  ans", results_found_field);
+          console.log("GET  ans", results_found_field);
 
-        // Если поле найдено и данные являются актуальными, то возвращаем
-        if (!!results_found_field[val_key]) {
-          if (
-            req.body.time < results_found_field[time_key] ||
-            req.body.time == null
-          ) {
-            for (key in results_found_field) resolve(results_found_field);
+          if (!!results_found_field[val_key]) {
+            if (req.body.time < results_found_field[time_key] || req.body.time == null) {
+              for (key in results_found_field) resolve(results_found_field);
+            } else {
+              resolve({
+                [val_key]: {},
+                [time_key]: null,
+              });
+            }
           } else {
             resolve({
-              [val_key]: null,
+              [val_key]: {},
               [time_key]: null,
             });
           }
@@ -145,9 +143,7 @@ module.exports.update = function (req, database, collection, next) {
                   next(err);
                 }
               })
-              .catch((err) => {
-                next(err);
-              });
+              .catch((err) => next(err));
           } else {
             resolve({
               message: "Данные не являются актуальными",
@@ -176,9 +172,7 @@ module.exports.update = function (req, database, collection, next) {
                 next(err);
               }
             })
-            .catch((err) => {
-              next(err);
-            });
+            .catch((err) => next(err));
         }
 
         // Обновляем время рядом с каждым _V (val_key)
@@ -195,9 +189,7 @@ module.exports.update = function (req, database, collection, next) {
           }
         }
       })
-      .catch((err) => {
-        next(err);
-      });
+      .catch((err) => next(err));
   });
 };
 
@@ -269,5 +261,20 @@ module.exports.remove = function (req, database, collection, next) {
       .catch((err) => {
         next(err);
       });
+  });
+};
+
+module.exports.create = function (req, database, collection, data, next) {
+  console.log("create req.body", req.body);
+  return new Promise((resolve, reject) => {
+    console.log("CREATE ", { data });
+    db.create(database, collection, data)
+      .then((results) => {
+        resolve({
+          message: "Данные добавлены",
+          code: 0,
+        });
+      })
+      .catch((err) => next(err));
   });
 };

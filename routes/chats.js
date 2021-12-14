@@ -1,7 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const db = require("../db/db");
-const messaging = require("./firebase/firebase_conf");
 const { val_key, time_key, wrap, unwrap } = require("../db/wrapper");
 const { newChatNotification } = require("./firebase/repository");
 
@@ -206,29 +205,5 @@ router.post("/get", (req, res, next) => {
       next(err);
     });
 });
-
-// router.post("/send_message", (req, res, next) => {
-//   console.log("send_message CUR req.body", req.body);
-//   var filter = { id: Number(req.body.chat_id) };
-//   var servertime = new Date().getTime(); // Текущее время сервера
-//   var update_fields = { ["messages." + servertime]: req.body.message };
-
-//   db.update(db.users_database, db.chats_collection, filter, update_fields)
-//     .then((results) => {
-//       if (!!results) {
-//         res.send({
-//           message: "Данные обновлены",
-//           time: servertime,
-//         });
-//       } else {
-//         const err = new Error("Данные не обновлены!");
-//         err.status = 400;
-//         next(err);
-//       }
-//     })
-//     .catch((err) => {
-//       next(err);
-//     });
-// });
 
 module.exports = router;

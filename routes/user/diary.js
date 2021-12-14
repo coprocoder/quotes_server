@@ -4,35 +4,29 @@ const jwt = require("jwt-simple");
 
 const db = require("../../db/db");
 const config = require("../../config/config");
-const db_operations = require("./repository");
+const repository = require("./repository");
 const { val_key, time_key, wrap, unwrap } = require("../../db/wrapper");
 
 // Get existed user
 router.post("/get", async (req, res, next) => {
-  await db_operations
-    .get(req, db.users_database, db.diaries_collection, next)
-    .then((data) => {
-      console.log("DIARY get response", data);
-      res.send(data);
-    });
+  await repository.get(req, db.users_database, db.diaries_collection, next).then((data) => {
+    console.log("DIARY get response", data);
+    res.send(data);
+  });
 });
 
 router.post("/update", async (req, res, next) => {
-  await db_operations
-    .update(req, db.users_database, db.diaries_collection, next)
-    .then((data) => {
-      console.log("DIARY update response", data);
-      res.send(data);
-    });
+  await repository.update(req, db.users_database, db.diaries_collection, next).then((data) => {
+    console.log("DIARY update response", data);
+    res.send(data);
+  });
 });
 
 router.post("/remove", async (req, res, next) => {
-  await db_operations
-    .remove(req, db.users_database, db.diaries_collection, next)
-    .then((data) => {
-      console.log("DIARY remove response", data);
-      res.send(data);
-    });
+  await repository.remove(req, db.users_database, db.diaries_collection, next).then((data) => {
+    console.log("DIARY remove response", data);
+    res.send(data);
+  });
 });
 
 // Fill profile diary random values
@@ -98,9 +92,7 @@ router.post("/autofill", (req, res, next) => {
           let var_limit_sum = limit_max - limit_min;
 
           // Генерируем случайное значение в этом диапазоне
-          let new_hist_val = Number(
-            Math.random() * var_limit_sum + limit_min
-          ).toFixed(0);
+          let new_hist_val = Number(Math.random() * var_limit_sum + limit_min).toFixed(0);
 
           history_addictions[hist_keys_list[hist_key]][new_time] = {
             value: Number(new_hist_val),
