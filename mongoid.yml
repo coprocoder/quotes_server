@@ -1,4 +1,0 @@
-production:
-  sessions:
-    default:
-      uri: mongodb+srv://coprocoder:1@med.gcalr.mongodb.net/usersdb?retryWrites=true&w=majority
